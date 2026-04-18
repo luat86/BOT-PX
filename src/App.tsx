@@ -159,9 +159,6 @@ const LoginScreen = ({ onLogin }: { onLogin: (key: string) => void }) => {
                         <span>Đăng nhập hệ thống</span>
                         <ArrowRight size={18} />
                     </button>
-                    <div className="text-center">
-                        <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-xs text-sky-600 font-bold hover:underline">Nhận API Key miễn phí tại đây</a>
-                    </div>
                 </form>
             </div>
         </div>
@@ -248,22 +245,12 @@ const PriceQuoteTemplate = React.forwardRef(({ data }: {data: any}, ref: any) =>
                     </table>
                 </div>
 
-                {data.imageUrl && (
-                    <div className="mt-6 mb-8">
-                        <div className="flex justify-between items-end mb-4 border-b pb-2">
-                            <h4 className="text-[14px] font-bold uppercase text-slate-900">2. Phối cảnh minh họa dự án</h4>
-                        </div>
-                        <div className="rounded-2xl overflow-hidden border border-slate-200 aspect-video bg-slate-50 shadow-inner">
-                            <img src={data.imageUrl} alt="Phối cảnh dự án" className="w-full h-full object-cover" crossOrigin="anonymous" />
-                        </div>
-                    </div>
-                )}
             </div>
 
             {/* Trang 2: Phạm vi công việc và Chữ ký */}
             <div id="capture-page-2" className="pdf-page bg-white mx-auto p-[15mm] w-[210mm] min-h-[297mm] font-sans text-slate-800 shadow-sm mb-10 overflow-hidden relative border border-slate-200">
                 <div className="mb-8">
-                    <h4 className="text-[14px] font-bold uppercase text-slate-900 mb-4 border-b pb-2">3. Đơn giá & Thành tiền</h4>
+                    <h4 className="text-[14px] font-bold uppercase text-slate-900 mb-4 border-b pb-2">2. Đơn giá & Thành tiền</h4>
                     <div className="p-5 bg-slate-50 rounded-xl border border-slate-200">
                         <div className="flex justify-between items-center py-2">
                             <span className="text-[13px]">Đơn giá thi công chuẩn (m²)</span>
@@ -277,7 +264,7 @@ const PriceQuoteTemplate = React.forwardRef(({ data }: {data: any}, ref: any) =>
                 </div>
 
                 <div className="mb-10">
-                    <h4 className="text-[14px] font-bold uppercase text-slate-900 mb-4 border-b pb-2">4. Phạm vi công việc chính</h4>
+                    <h4 className="text-[14px] font-bold uppercase text-slate-900 mb-4 border-b pb-2">3. Phạm vi công việc chính</h4>
                     <div className="grid grid-cols-1 gap-y-3">
                         {[
                             { label: "Chuẩn bị:", text: "Lập lán trại, vận chuyển thiết bị, tập kết vật tư đầu vào." },
@@ -474,39 +461,6 @@ export default function App() {
     }} />
   }
 
-  const handleExportImage = async () => {
-    setExporting(true);
-    
-    try {
-        const isPricing = result.mode === 'pricing' || result.title?.includes('Báo giá');
-        const elementIds = isPricing ? ['capture-page-1', 'capture-page-2'] : ['capture-doc'];
-        if (isPricing && document.getElementById('capture-page-3')) {
-            elementIds.push('capture-page-3');
-        }
-        
-        for (const id of elementIds) {
-            const element = document.getElementById(id);
-            if (!element) continue;
-            
-            const dataUrl = await htmlToImage.toPng(element, {
-                pixelRatio: 2,
-                backgroundColor: "#ffffff"
-            });
-            
-            const link = document.createElement("a");
-            link.href = dataUrl;
-            link.download = `${result.title.replace(/\s+/g, '_')}_${id}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-    } catch (err) {
-        console.error("Export error:", err);
-    } finally {
-        setExporting(false);
-    }
-  };
-
   const handleExportPDF = async () => {
     if (!result) return;
     setExporting(true);
@@ -514,10 +468,6 @@ export default function App() {
         const isPricing = result.mode === 'pricing' || result.title?.includes('Báo giá');
         const elementIds = isPricing ? ['capture-page-1', 'capture-page-2'] : ['capture-doc'];
         
-        if (isPricing && document.getElementById('capture-page-3')) {
-            elementIds.push('capture-page-3');
-        }
-
         let pdf: jsPDF | null = null;
         const pdfWidth = 210;
 
@@ -528,7 +478,7 @@ export default function App() {
 
             const elWidth = element.offsetWidth || 794;
             const elHeight = element.offsetHeight || 1123;
-            // Calculate proportional height to prevent text from being squished / distorted (Fixing "chữ tràn lan")
+            // Calculate proportional height to prevent text from being squished / distorted
             const pdfHeight = (elHeight * pdfWidth) / elWidth;
 
             const canvas = await htmlToImage.toCanvas(element, {
@@ -554,7 +504,6 @@ export default function App() {
                 pdf.addPage([pdfWidth, pdfHeight], 'portrait');
             }
             
-            // Draw exactly using standard proportional height
             pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
         }
         
@@ -601,56 +550,6 @@ ${result.content}`;
         alert("Có lỗi xảy ra khi rà soát pháp lý. Vui lòng thử lại.");
     } finally {
         setIsReviewingLegal(false);
-    }
-  };
-
-  const handleExportWord = () => {
-    if (!result) return;
-    setExporting(true);
-    try {
-        const wrapper = document.getElementById('document-content-wrapper');
-        if (!wrapper) return;
-
-        const clone = wrapper.cloneNode(true) as HTMLElement;
-        
-        const noPrintElements = clone.querySelectorAll('.no-print');
-        noPrintElements.forEach(el => el.parentNode?.removeChild(el));
-
-        const preHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-        <head>
-            <meta charset='utf-8'>
-            <title>${result.title}</title>
-            <style>
-                body { font-family: 'Times New Roman', serif; font-size: 12pt; }
-                table { border-collapse: collapse; width: 100%; margin-bottom: 1em; }
-                th, td { border: 1px solid black; padding: 5px; text-align: left; }
-                th { font-weight: bold; }
-                h1, h2, h3, h4, h5, h6 { font-family: 'Times New Roman', serif; }
-                .text-center { text-align: center; }
-                .text-right { text-align: right; }
-                .font-bold { font-weight: bold; }
-                .mb-4 { margin-bottom: 1rem; }
-                .mt-4 { margin-top: 1rem; }
-            </style>
-        </head>
-        <body>`;
-        const postHtml = "</body></html>";
-        const html = preHtml + clone.innerHTML + postHtml;
-
-        const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${result.title.replace(/\s+/g, '_')}.doc`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    } catch (error) {
-        console.error("Word Export Error:", error);
-        alert("Có lỗi xảy ra khi xuất file Word.");
-    } finally {
-        setExporting(false);
     }
   };
 
@@ -911,17 +810,6 @@ Yêu cầu:
             }
         }
 
-        let imageUrl = null;
-        if (targetSubType.toLowerCase().includes("báo giá")) {
-            const buildingTypeEng = formData.buildingType === 'Nhà phố' ? 'townhouse' : 
-                                  formData.buildingType === 'Biệt thự' ? 'villa' : 
-                                  formData.buildingType === 'Nhà cấp 4' ? 'single-story house' :
-                                  formData.buildingType === 'Căn hộ chung cư' ? 'apartment interior' :
-                                  formData.buildingType === 'Văn phòng' ? 'office building' : 'building';
-            const imgPrompt = `A high quality 3D architectural rendering of a modern ${formData.floors}-story ${buildingTypeEng} in ${formData.location}, photorealistic, bright lighting.`;
-            imageUrl = await generateImage(imgPrompt);
-        }
-
         let timelineData = null;
         if (!isRecord) {
             try {
@@ -970,7 +858,6 @@ Chỉ trả về JSON, không giải thích thêm.`,
             area: formData.area,
             floors: formData.floors,
             buildingType: formData.buildingType,
-            imageUrl: imageUrl, 
             unitPrice: unitPrice,
             timeline: timelineData,
             acceptanceObject: formData.acceptanceObject,
@@ -981,8 +868,7 @@ Chỉ trả về JSON, không giải thích thêm.`,
         };
 
         const resObjForFirestore = { 
-            ...resObjForDisplay,
-            imageUrl: imageUrl && imageUrl.length > 500000 ? null : imageUrl 
+            ...resObjForDisplay
         };
         
         /* Firebase is disabled in this mockup
@@ -1304,25 +1190,14 @@ Chỉ trả về JSON, không giải thích thêm.`,
                             {isReviewingLegal ? <Loader2 size={18} className="animate-spin"/> : <Scale size={18}/>}
                             {isReviewingLegal ? "Đang rà soát..." : "Rà soát Pháp lý"}
                         </button>
-                        <button onClick={handleExportWord} disabled={exporting} className="px-6 py-3 bg-blue-600 text-white rounded-xl text-xs font-bold uppercase flex items-center gap-2 hover:bg-blue-700 transition-all shadow-lg disabled:bg-slate-400">
-                            {exporting ? <Loader2 size={18} className="animate-spin"/> : <FileText size={18}/>}
-                            {exporting ? "Đang xử lý..." : "Lưu về Word (Docs)"}
-                        </button>
-                        <button onClick={handleExportImage} disabled={exporting} className="px-6 py-3 bg-emerald-600 text-white rounded-xl text-xs font-bold uppercase flex items-center gap-2 hover:bg-emerald-700 transition-all shadow-lg disabled:bg-slate-400">
-                            {exporting ? <Loader2 size={18} className="animate-spin"/> : <ImageIcon size={18}/>}
-                            {exporting ? "Đang xử lý..." : "Xuất File Ảnh (Gửi Zalo)"}
-                        </button>
                         <button onClick={handleExportPDF} disabled={exporting} className="px-6 py-3 bg-[#0c4a6e] text-white rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-3 shadow-xl hover:bg-black transition-all disabled:bg-slate-400">
                             {exporting ? <Loader2 size={18} className="animate-spin"/> : <Printer size={18}/>}
-                            {exporting ? "Đang tạo PDF..." : "Lưu File PDF"}
-                        </button>
-                        <button onClick={() => downloadTxtFile(result.title, result.content)} className="px-4 py-3 text-slate-400 hover:text-sky-600 transition-all">
-                            <FileDown size={20}/>
+                            {exporting ? "Đang tạo PDF..." : "Lưu File PDF A4"}
                         </button>
                     </div>
                 </div>
                 
-                <div className="no-print" id="document-content-wrapper">
+                <div className="no-print mx-auto" id="document-content-wrapper">
                     {result.mode === 'pricing' || result.title?.includes('Báo giá') ? 
                         <PriceQuoteTemplate data={result} ref={contentRef} /> : 
                         <DocumentTemplate data={result} ref={contentRef} />
