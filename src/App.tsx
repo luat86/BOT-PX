@@ -4,7 +4,8 @@ import {
   DollarSign, Printer, ChevronRight, ClipboardList, ShieldCheck, 
   HardHat, Construction, Info, CheckSquare, Download, Image as ImageIcon,
   Stamp, Briefcase, Ruler, PenTool, AlertCircle, ChevronDown, ChevronUp,
-  Camera, FileDown, Upload, TrendingUp, Scale, ArrowRight, Clock
+  Camera, FileDown, Upload, TrendingUp, Scale, ArrowRight, Clock,
+  Building2, Users, Award, Shield, CheckCircle2, Target, Wrench, Star
 } from 'lucide-react';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from 'firebase/auth';
@@ -932,44 +933,102 @@ Chỉ trả về JSON, không giải thích thêm.`,
 
       <main className="container mx-auto py-6 md:py-10 px-4 md:px-6">
         {view === 'home' && (
-            <div className="max-w-6xl mx-auto">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-                    <h2 className="text-3xl md:text-3xl font-black text-slate-800 tracking-tight uppercase font-display">Kho Hồ Sơ Dự Án</h2>
-                    <button onClick={() => setView('generator')} className="bg-slate-900 text-white px-6 py-2.5 rounded-xl text-[11px] font-bold uppercase flex items-center gap-2 hover:bg-sky-600 transition-all shadow-md hover:shadow-sky-500/20">
-                        <PenTool size={14}/> Tạo mới
+            <div className="max-w-6xl mx-auto space-y-12 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                {/* Hero Section */}
+                <div className="relative bg-slate-900 rounded-[2rem] overflow-hidden shadow-2xl">
+                    <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/90 to-transparent z-10"></div>
+                    <div className="absolute inset-0 opacity-30 bg-[url('https://images.unsplash.com/photo-1541888086425-d81bb19240f5?auto=format&fit=crop&q=80')] bg-cover bg-center"></div>
+                    
+                    <div className="relative z-20 p-8 md:p-16 w-full md:w-2/3">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-500/20 border border-sky-500/30 text-sky-400 text-xs font-bold uppercase tracking-widest mb-6">
+                            <Star size={14} className="fill-sky-400" /> Hệ thống nhà thầu số
+                        </div>
+                        <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight uppercase font-display leading-[1.1] mb-6">
+                            Kiến tạo không gian <br /> <span className="text-sky-400">Nâng tầm giá trị</span>
+                        </h2>
+                        <div className="h-1.5 w-20 bg-sky-500 rounded-full mb-6"></div>
+                        <p className="text-slate-300 text-sm md:text-base leading-relaxed max-w-xl mb-8">
+                            Phố Xanh AI tự hào là đơn vị tiên phong trong việc ứng dụng công nghệ trực tuyến vào quản trị nhà thầu và thi công xây dựng. Chúng tôi cam kết mang đến chất lượng vượt trội, minh bạch và hiệu quả định mức cao nhất cho mọi dự án lớn nhỏ toàn quốc.
+                        </p>
+                        <button onClick={() => setView('generator')} className="bg-sky-500 text-white px-8 py-4 rounded-xl text-sm font-bold uppercase tracking-wider flex items-center gap-3 hover:bg-sky-400 transition-all shadow-lg hover:shadow-sky-500/30 group">
+                            Bắt đầu dự án mới <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Stats */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                    {[
+                        { num: "15+", label: "Năm kinh nghiệm", icon: Briefcase },
+                        { num: "500+", label: "Dự án hoàn thành", icon: Building2 },
+                        { num: "100%", label: "Đúng tiến độ duyệt", icon: CheckCircle2 },
+                        { num: "24/7", label: "Hỗ trợ khách hàng", icon: Users }
+                    ].map((stat, i) => {
+                        const Icon = stat.icon;
+                        return (
+                            <div key={i} className="bg-white border border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center shadow-sm hover:shadow-md transition-all group">
+                                <div className="p-3 bg-sky-50 text-sky-600 rounded-xl mb-4 group-hover:scale-110 group-hover:bg-sky-500 group-hover:text-white transition-all">
+                                    <Icon size={24} />
+                                </div>
+                                <h3 className="text-3xl font-black text-slate-900 font-display mb-1">{stat.num}</h3>
+                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{stat.label}</p>
+                            </div>
+                        )
+                    })}
+                </div>
+
+                {/* Core Capabilities */}
+                <div>
+                    <div className="text-center mb-10">
+                        <h3 className="text-2xl font-black text-slate-900 uppercase font-display tracking-tight mb-3">Năng lực cốt lõi</h3>
+                        <p className="text-sm text-slate-500 max-w-2xl mx-auto">Hệ thống giải pháp toàn diện từ thiết kế, thi công đến quản lý vận hành số hóa, đáp ứng mọi tiêu chuẩn khắt khe nhất.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {[
+                            {
+                                title: "Thiết kế Kiến trúc & Nội thất",
+                                desc: "Sáng tạo không gian sống và làm việc tối ưu hóa công năng, thẩm mỹ cao với hệ thống quy chuẩn bóc tách khắt khe.",
+                                icon: Ruler
+                            },
+                            {
+                                title: "Thi công Xây dựng trọn gói",
+                                desc: "Đội ngũ kỹ sư tay nghề cao, quy trình kiểm soát chất lượng nghiêm ngặt đảm bảo kết cấu vững chắc, an toàn tuyệt đối.",
+                                icon: Construction
+                            },
+                            {
+                                title: "Quản trị Dự án AI 5.0",
+                                desc: "Ứng dụng trí tuệ nhân tạo (AI) thông minh vào lập dự toán, quản lý tiến độ và kiểm soát chất lượng theo thời gian thực.",
+                                icon: ShieldCheck
+                            }
+                        ].map((cap, i) => {
+                            const Icon = cap.icon;
+                            return (
+                                <div key={i} className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:border-sky-300 hover:shadow-xl transition-all relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-500 opacity-50"></div>
+                                    <div className="relative z-10">
+                                        <div className="w-14 h-14 bg-slate-900 text-white rounded-2xl flex items-center justify-center mb-6 shadow-md group-hover:bg-sky-500 group-hover:rotate-6 transition-all">
+                                            <Icon size={28} />
+                                        </div>
+                                        <h4 className="text-lg font-bold text-slate-900 mb-3">{cap.title}</h4>
+                                        <p className="text-sm text-slate-600 leading-relaxed">{cap.desc}</p>
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </div>
+
+                {/* Banner Call to Action */}
+                <div className="bg-slate-900 rounded-[2rem] p-10 md:p-14 text-center shadow-xl relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-sky-500 to-transparent"></div>
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-sky-900/20 blur-3xl rounded-full"></div>
+                    <h3 className="relative z-10 text-2xl md:text-3xl font-black text-white font-display uppercase tracking-tight mb-4">Sẵn sàng hiện thực hóa dự án?</h3>
+                    <p className="relative z-10 text-slate-300 text-sm md:text-base max-w-2xl mx-auto mb-8 leading-relaxed">Hãy để công nghệ Trợ lý ảo của chúng tôi hỗ trợ bạn lập dự toán tài chính, hợp đồng và hồ sơ khép kín chỉ trong vài phút thay vì vài tuần làm việc.</p>
+                    <button onClick={() => setView('generator')} className="relative z-10 inline-flex items-center gap-3 bg-white text-slate-900 px-8 py-4 rounded-xl text-sm font-bold uppercase tracking-wider hover:bg-sky-50 hover:scale-105 transition-all shadow-lg hover:shadow-xl">
+                        <PenTool size={18} className="text-sky-600" /> Tạo Hồ Sơ Ngay
                     </button>
                 </div>
-                
-                {history.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
-                        {history.map(item => {
-                            const IconComponent = getIconForType(item.title, item.mode);
-                            return (
-                            <div key={item.id} onClick={() => { setResult(item); setView('result'); }} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-2xl hover:border-sky-400 cursor-pointer transition-all group relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-sky-50 rounded-bl-full -mr-12 -mt-12 transition-transform group-hover:scale-150 duration-500 opacity-50"></div>
-                                <div className="flex justify-between items-start mb-6 relative z-10">
-                                <div className="p-3 rounded-xl bg-sky-50 text-sky-600 group-hover:bg-sky-500 group-hover:text-white transition-all shadow-sm">
-                                    <IconComponent size={20}/>
-                                </div>
-                                <span className="text-[10px] text-slate-400 font-bold bg-slate-50/50 border border-slate-100 px-2 py-1 rounded-md italic flex items-center gap-1 group-hover:bg-sky-50 group-hover:text-sky-600 group-hover:border-sky-100 transition-colors">
-                                    <Clock size={10} /> {getTimeAgo(item.timestamp)}
-                                </span>
-                                </div>
-                                <h3 className="font-bold text-slate-800 text-base leading-snug mb-4 group-hover:text-sky-700 transition-colors h-12 line-clamp-2">{item.title}</h3>
-                                <div className="border-t pt-4 flex items-center justify-between text-[11px] font-bold uppercase text-slate-400">
-                                    <span className="flex items-center gap-1"><MapPin size={12}/> {item.location}</span>
-                                    <span>{item.area}m² | {item.floors}T</span>
-                                </div>
-                            </div>
-                        )})}
-                    </div>
-                ) : (
-                    <div className="bg-white border-2 border-dashed border-slate-200 rounded-[3rem] py-32 flex flex-col items-center justify-center text-slate-400">
-                        <div className="p-6 bg-slate-50 rounded-full mb-6"><Briefcase size={48}/></div>
-                        <p className="font-bold text-sm uppercase tracking-widest">Chưa có hồ sơ nào được tạo.</p>
-                        <button onClick={() => setView('generator')} className="mt-4 text-sky-600 font-bold hover:underline">Bắt đầu khởi tạo ngay</button>
-                    </div>
-                )}
             </div>
         )}
 
