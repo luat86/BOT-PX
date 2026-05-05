@@ -132,32 +132,42 @@ const LoginScreen = ({ onLogin }: { onLogin: (key: string) => void }) => {
     };
 
     return (
-        <div className="min-h-screen bg-[#f8fafc] flex flex-col items-center justify-center p-4">
-            <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-slate-100 animate-in fade-in zoom-in-95 duration-500">
-                <div className="flex justify-center mb-6">
-                    <div className="bg-sky-50 p-5 rounded-full border-4 border-white shadow-sm">
-                        <HardHat size={56} className="text-[#0ea5e9]" />
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col items-center justify-center p-4">
+            <div className="bg-white/80 backdrop-blur-xl p-10 rounded-[2rem] shadow-2xl max-w-md w-full border border-white animate-in fade-in zoom-in-95 duration-500 ring-1 ring-slate-900/5">
+                <div className="flex justify-center mb-8">
+                    <div className="bg-gradient-to-b from-sky-50 to-white p-5 rounded-3xl shadow-sm border border-slate-100 ring-1 ring-slate-900/5 relative group cursor-pointer transition-all hover:scale-105">
+                        <div className="absolute inset-0 bg-sky-400 rounded-3xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                        <HardHat size={56} className="text-sky-500 relative drop-shadow-sm" />
                     </div>
                 </div>
-                <h1 className="text-2xl font-black text-center uppercase tracking-tight text-[#0c4a6e] mb-2 leading-none">PHỐ XANH <span className="text-sky-500">AI</span></h1>
-                <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest text-center mb-8">Hệ Thống Quản Trị Nhà Thầu 5.0</p>
+                <h1 className="text-3xl font-black text-center font-display tracking-tight text-slate-800 mb-2 leading-none">
+                    PHỐ XANH <span className="text-sky-500 bg-sky-50 px-2 py-1 rounded-lg border border-sky-100">AI</span>
+                </h1>
+                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-[0.2em] text-center mb-10">
+                    Hệ Thống Quản Trị Nhà Thầu 5.0
+                </p>
                 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className="block text-[11px] font-bold uppercase text-slate-700 mb-2">Google Gemini API Key</label>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2 ml-1">
+                            Google Gemini API Key
+                        </label>
                         <input 
                             type="password" 
                             required 
-                            className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent font-mono text-sm transition-all"
+                            className="w-full p-4 bg-slate-50/50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-sky-500/20 focus:border-sky-500 font-mono text-sm transition-all shadow-inner"
                             placeholder="AIzaSy..."
                             value={key}
                             onChange={e => setKey(e.target.value)}
                         />
-                        <p className="text-xs text-slate-500 mt-2">Mã khóa này được lưu trữ an toàn trên trình duyệt của bạn và dùng để kết nối trực tiếp với máy chủ Google.</p>
+                        <p className="text-[10px] text-slate-400 mt-3 flex items-start gap-2 leading-relaxed ml-1">
+                            <Info size={14} className="min-w-max text-sky-400" />
+                            Mã khóa được mã hóa và lưu trữ an toàn ngay trên trình duyệt, kết nối trực tiếp với máy tính chủ Google.
+                        </p>
                     </div>
-                    <button type="submit" className="w-full h-14 bg-[#0c4a6e] hover:bg-black text-white font-black rounded-xl transition-all shadow-lg hover:shadow-xl uppercase tracking-wider text-sm flex justify-center items-center gap-2">
+                    <button type="submit" className="w-full h-14 bg-slate-900 hover:bg-sky-600 text-white font-bold rounded-2xl transition-all shadow-lg hover:shadow-sky-500/25 uppercase tracking-widest text-[12px] flex justify-center items-center gap-3">
                         <span>Đăng nhập hệ thống</span>
-                        <ArrowRight size={18} />
+                        <ArrowRight size={16} />
                     </button>
                 </form>
             </div>
@@ -900,21 +910,21 @@ Chỉ trả về JSON, không giải thích thêm.`,
           setIsAuthenticated(false);
       }} />
       
-      <div className="bg-white border-b border-slate-200 sticky top-[68px] z-40 no-print">
+      <div className="bg-white/80 backdrop-blur-xl border-b border-slate-200/50 sticky top-[68px] z-40 no-print shadow-sm">
         <div className="container mx-auto flex overflow-x-auto scrollbar-hide">
-          <button onClick={() => { setView('home'); setResult(null); }} className={`px-4 py-3 md:px-8 md:py-5 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${view === 'home' ? 'border-sky-600 text-sky-700 bg-sky-50/50' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>
+          <button onClick={() => { setView('home'); setResult(null); }} className={`px-4 py-3 md:px-8 md:py-5 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${view === 'home' ? 'border-sky-500 text-sky-600 bg-sky-50/30' : 'border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50'}`}>
             <HomeIcon size={16}/> Dự án của tôi
           </button>
-          <button onClick={() => { setView('generator'); setResult(null); }} className={`px-4 py-3 md:px-8 md:py-5 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${view === 'generator' ? 'border-sky-600 text-sky-700 bg-sky-50/50' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>
+          <button onClick={() => { setView('generator'); setResult(null); }} className={`px-4 py-3 md:px-8 md:py-5 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${view === 'generator' ? 'border-sky-500 text-sky-600 bg-sky-50/30' : 'border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50'}`}>
             <PenTool size={16}/> Tạo hồ sơ mới
           </button>
-          <button onClick={() => { setView('workflow'); setResult(null); }} className={`px-4 py-3 md:px-8 md:py-5 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${view === 'workflow' ? 'border-sky-600 text-sky-700 bg-sky-50/50' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>
+          <button onClick={() => { setView('workflow'); setResult(null); }} className={`px-4 py-3 md:px-8 md:py-5 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${view === 'workflow' ? 'border-sky-500 text-sky-600 bg-sky-50/30' : 'border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50'}`}>
             <ClipboardList size={16}/> Quy trình thi công
           </button>
-          <button onClick={() => { setView('internal'); setResult(null); }} className={`px-4 py-3 md:px-8 md:py-5 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${view === 'internal' ? 'border-sky-600 text-sky-700 bg-sky-50/50' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>
+          <button onClick={() => { setView('internal'); setResult(null); }} className={`px-4 py-3 md:px-8 md:py-5 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${view === 'internal' ? 'border-sky-500 text-sky-600 bg-sky-50/30' : 'border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50'}`}>
             <FileText size={16}/> Tài liệu nội bộ
           </button>
-          <button onClick={() => { setView('market'); setResult(null); }} className={`px-4 py-3 md:px-8 md:py-5 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${view === 'market' ? 'border-sky-600 text-sky-700 bg-sky-50/50' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>
+          <button onClick={() => { setView('market'); setResult(null); }} className={`px-4 py-3 md:px-8 md:py-5 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${view === 'market' ? 'border-sky-500 text-sky-600 bg-sky-50/30' : 'border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50'}`}>
             <TrendingUp size={16}/> Đơn giá thị trường
           </button>
         </div>
@@ -923,9 +933,9 @@ Chỉ trả về JSON, không giải thích thêm.`,
       <main className="container mx-auto py-6 md:py-10 px-4 md:px-6">
         {view === 'home' && (
             <div className="max-w-6xl mx-auto">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                    <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight uppercase">Kho Hồ Sơ Dự Án</h2>
-                    <button onClick={() => setView('generator')} className="bg-sky-600 text-white px-6 py-2 rounded-xl text-xs font-bold uppercase flex items-center gap-2 hover:bg-sky-700 transition-all">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+                    <h2 className="text-3xl md:text-3xl font-black text-slate-800 tracking-tight uppercase font-display">Kho Hồ Sơ Dự Án</h2>
+                    <button onClick={() => setView('generator')} className="bg-slate-900 text-white px-6 py-2.5 rounded-xl text-[11px] font-bold uppercase flex items-center gap-2 hover:bg-sky-600 transition-all shadow-md hover:shadow-sky-500/20">
                         <PenTool size={14}/> Tạo mới
                     </button>
                 </div>
@@ -938,12 +948,12 @@ Chỉ trả về JSON, không giải thích thêm.`,
                             <div key={item.id} onClick={() => { setResult(item); setView('result'); }} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-2xl hover:border-sky-400 cursor-pointer transition-all group relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-sky-50 rounded-bl-full -mr-12 -mt-12 transition-transform group-hover:scale-150 duration-500 opacity-50"></div>
                                 <div className="flex justify-between items-start mb-6 relative z-10">
-                                    <div className="p-3 rounded-xl bg-sky-50 text-sky-600 group-hover:bg-sky-600 group-hover:text-white transition-all">
-                                        <IconComponent size={20}/>
-                                    </div>
-                                    <span className="text-[10px] text-slate-400 font-bold bg-slate-50 px-2 py-1 rounded italic flex items-center gap-1 group-hover:bg-sky-50 group-hover:text-sky-600 transition-colors">
-                                        <Clock size={10} /> {getTimeAgo(item.timestamp)}
-                                    </span>
+                                <div className="p-3 rounded-xl bg-sky-50 text-sky-600 group-hover:bg-sky-500 group-hover:text-white transition-all shadow-sm">
+                                    <IconComponent size={20}/>
+                                </div>
+                                <span className="text-[10px] text-slate-400 font-bold bg-slate-50/50 border border-slate-100 px-2 py-1 rounded-md italic flex items-center gap-1 group-hover:bg-sky-50 group-hover:text-sky-600 group-hover:border-sky-100 transition-colors">
+                                    <Clock size={10} /> {getTimeAgo(item.timestamp)}
+                                </span>
                                 </div>
                                 <h3 className="font-bold text-slate-800 text-base leading-snug mb-4 group-hover:text-sky-700 transition-colors h-12 line-clamp-2">{item.title}</h3>
                                 <div className="border-t pt-4 flex items-center justify-between text-[11px] font-bold uppercase text-slate-400">
@@ -1021,14 +1031,14 @@ Chỉ trả về JSON, không giải thích thêm.`,
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-1">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Loại công trình</label>
-                            <select className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-bold focus:border-sky-500 outline-none" value={formData.buildingType} onChange={e => setFormData({...formData, buildingType: e.target.value})}>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter ml-1">Loại công trình</label>
+                            <select className="w-full p-4 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-bold focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 outline-none transition-all shadow-inner" value={formData.buildingType} onChange={e => setFormData({...formData, buildingType: e.target.value})}>
                                 {BUILDING_TYPES.map(p => <option key={p} value={p}>{p}</option>)}
                             </select>
                         </div>
                         <div className="space-y-1">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Địa điểm thi công</label>
-                            <select className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-bold focus:border-sky-500 outline-none" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})}>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter ml-1">Địa điểm thi công</label>
+                            <select className="w-full p-4 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-bold focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 outline-none transition-all shadow-inner" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})}>
                                 {VIETNAM_PROVINCES.map(p => <option key={p} value={p}>{p}</option>)}
                             </select>
                         </div>
@@ -1037,12 +1047,12 @@ Chỉ trả về JSON, không giải thích thêm.`,
                     {!(formData.subType.toLowerCase().includes('biên bản') || formData.subType.toLowerCase().includes('nhật ký')) && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Diện tích (m²)</label>
-                                <input type="number" value={formData.area} className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-bold focus:border-sky-500 outline-none" onChange={e => setFormData({...formData, area: e.target.value})} />
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter ml-1">Diện tích (m²)</label>
+                                <input type="number" value={formData.area} className="w-full p-4 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-bold focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 outline-none transition-all shadow-inner" onChange={e => setFormData({...formData, area: e.target.value})} />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Số tầng</label>
-                                <input type="number" value={formData.floors} className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-bold focus:border-sky-500 outline-none" onChange={e => setFormData({...formData, floors: e.target.value})} />
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter ml-1">Số tầng</label>
+                                <input type="number" value={formData.floors} className="w-full p-4 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-bold focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 outline-none transition-all shadow-inner" onChange={e => setFormData({...formData, floors: e.target.value})} />
                             </div>
                         </div>
                     )}
@@ -1050,47 +1060,47 @@ Chỉ trả về JSON, không giải thích thêm.`,
                     {(formData.subType.toLowerCase().includes('biên bản') || formData.subType.toLowerCase().includes('nhật ký')) && (
                         <>
                             <div className="space-y-1">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Đối tượng nghiệm thu / Nội dung công việc</label>
-                                <input type="text" placeholder="VD: Nghiệm thu cốt thép móng, Nghiệm thu xây tường tầng 1..." value={formData.acceptanceObject} className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-bold focus:border-sky-500 outline-none" onChange={e => setFormData({...formData, acceptanceObject: e.target.value})} />
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter ml-1">Đối tượng nghiệm thu / Nội dung công việc</label>
+                                <input type="text" placeholder="VD: Nghiệm thu cốt thép móng, Nghiệm thu xây tường tầng 1..." value={formData.acceptanceObject} className="w-full p-4 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-bold focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 outline-none transition-all shadow-inner" onChange={e => setFormData({...formData, acceptanceObject: e.target.value})} />
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Thời gian thực hiện</label>
-                                    <input type="text" placeholder="VD: 08:00 ngày 15/10/2023" value={formData.acceptanceTime} className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-bold focus:border-sky-500 outline-none" onChange={e => setFormData({...formData, acceptanceTime: e.target.value})} />
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter ml-1">Thời gian thực hiện</label>
+                                    <input type="text" placeholder="VD: 08:00 ngày 15/10/2023" value={formData.acceptanceTime} className="w-full p-4 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-bold focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 outline-none transition-all shadow-inner" onChange={e => setFormData({...formData, acceptanceTime: e.target.value})} />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Thành phần tham gia</label>
-                                    <input type="text" placeholder="VD: Chủ nhà, Đại diện thi công, Giám sát" value={formData.participants} className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-bold focus:border-sky-500 outline-none" onChange={e => setFormData({...formData, participants: e.target.value})} />
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter ml-1">Thành phần tham gia</label>
+                                    <input type="text" placeholder="VD: Chủ nhà, Đại diện thi công, Giám sát" value={formData.participants} className="w-full p-4 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-bold focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 outline-none transition-all shadow-inner" onChange={e => setFormData({...formData, participants: e.target.value})} />
                                 </div>
                             </div>
                         </>
                     )}
 
                     {formData.subType.toLowerCase().includes('báo giá') && (
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Nguồn đơn giá thi công</label>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div className="space-y-3 mt-4">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter ml-1">Nguồn đơn giá thi công</label>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 bg-slate-50/50 p-2 rounded-2xl border border-slate-100 shadow-inner">
                                 <button 
                                     onClick={() => setFormData({...formData, priceSource: 'market'})}
-                                    className={`p-3 rounded-xl text-xs font-bold border transition-all ${formData.priceSource === 'market' ? 'bg-sky-50 border-sky-500 text-sky-700' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                                    className={`py-3 px-2 rounded-xl text-[10px] uppercase tracking-wider font-bold transition-all ${formData.priceSource === 'market' ? 'bg-white border text-sky-600 shadow-sm border-slate-100 ring-1 ring-slate-900/5' : 'text-slate-500 hover:bg-slate-200/50'}`}
                                 >
                                     Thị trường
                                 </button>
                                 <button 
                                     onClick={() => setFormData({...formData, priceSource: 'internal'})}
-                                    className={`p-3 rounded-xl text-xs font-bold border transition-all ${formData.priceSource === 'internal' ? 'bg-sky-50 border-sky-500 text-sky-700' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                                    className={`py-3 px-2 rounded-xl text-[10px] uppercase tracking-wider font-bold transition-all ${formData.priceSource === 'internal' ? 'bg-white border text-sky-600 shadow-sm border-slate-100 ring-1 ring-slate-900/5' : 'text-slate-500 hover:bg-slate-200/50'}`}
                                 >
                                     Nội bộ
                                 </button>
                                 <button 
                                     onClick={() => setFormData({...formData, priceSource: 'manual'})}
-                                    className={`p-3 rounded-xl text-xs font-bold border transition-all ${formData.priceSource === 'manual' ? 'bg-sky-50 border-sky-500 text-sky-700' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                                    className={`py-3 px-2 rounded-xl text-[10px] uppercase tracking-wider font-bold transition-all ${formData.priceSource === 'manual' ? 'bg-white border text-sky-600 shadow-sm border-slate-100 ring-1 ring-slate-900/5' : 'text-slate-500 hover:bg-slate-200/50'}`}
                                 >
                                     Nhập tay
                                 </button>
                                 <button 
                                     onClick={() => setFormData({...formData, priceSource: 'ai_estimate'})}
-                                    className={`p-3 rounded-xl text-xs font-bold border transition-all ${formData.priceSource === 'ai_estimate' ? 'bg-sky-50 border-sky-500 text-sky-700' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                                    className={`py-3 px-2 rounded-xl text-[10px] uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-1 ${formData.priceSource === 'ai_estimate' ? 'bg-white border text-sky-600 shadow-sm border-slate-100 ring-1 ring-slate-900/5' : 'text-slate-500 hover:bg-slate-200/50'}`}
                                 >
                                     AI Ước tính
                                 </button>
@@ -1101,32 +1111,35 @@ Chỉ trả về JSON, không giải thích thêm.`,
                                     type="number" 
                                     placeholder="Nhập đơn giá (VNĐ/m²)" 
                                     value={formData.manualUnitPrice} 
-                                    className="w-full p-3 mt-2 rounded-xl border border-slate-200 bg-slate-50 text-sm font-bold focus:border-sky-500 outline-none" 
+                                    className="w-full p-4 mt-2 rounded-xl border border-slate-200 bg-white text-sm font-bold focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 outline-none transition-all shadow-sm" 
                                     onChange={e => setFormData({...formData, manualUnitPrice: e.target.value})} 
                                 />
                             )}
                             {formData.priceSource === 'internal' && !internalData && (
-                                <p className="text-[10px] text-red-500 italic mt-1">Vui lòng tải lên tài liệu nội bộ ở tab "Tài liệu nội bộ" trước khi sử dụng.</p>
+                                <p className="text-[10px] text-red-500 italic mt-2 flex items-center gap-1"><AlertCircle size={12}/> Vui lòng tải lên tài liệu nội bộ ở tab "Tài liệu nội bộ" trước khi sử dụng.</p>
                             )}
                             {(formData.priceSource === 'market' || formData.priceSource === 'ai_estimate') && (
-                                <p className="text-[10px] text-slate-500 italic mt-1">AI sẽ tự động ước tính đơn giá thị trường dựa trên loại công trình và khu vực.</p>
+                                <p className="text-[10px] text-slate-500 italic mt-2 ml-1">AI sẽ tự động ước tính đơn giá thị trường dựa trên loại công trình và khu vực.</p>
                             )}
                         </div>
                     )}
 
                     <div className="space-y-1">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Ghi chú yêu cầu kỹ thuật</label>
-                        <textarea placeholder="Nhập các lưu ý về vật liệu, phong cách hoặc yêu cầu pháp lý..." className="w-full p-4 rounded-xl border border-slate-200 bg-slate-50 text-sm h-32 focus:ring-2 focus:ring-sky-500 outline-none transition-all" onChange={e => setFormData({...formData, situation: e.target.value})} />
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter ml-1">Ghi chú yêu cầu kỹ thuật</label>
+                        <textarea placeholder="Nhập các lưu ý về vật liệu, phong cách hoặc yêu cầu pháp lý..." className="w-full p-4 rounded-xl border border-slate-200 bg-slate-50/50 text-sm h-32 focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 outline-none transition-all shadow-inner resize-none" onChange={e => setFormData({...formData, situation: e.target.value})} />
                     </div>
 
-                    <div className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 bg-slate-50">
-                        <input type="checkbox" id="useInternal" checked={useInternalData} onChange={e => setUseInternalData(e.target.checked)} className="w-5 h-5 rounded border-slate-300 text-sky-600 focus:ring-sky-500" />
-                        <label htmlFor="useInternal" className="text-sm font-bold text-slate-700 cursor-pointer">Sử dụng Tài liệu nội bộ (Báo giá, Quy chuẩn công ty)</label>
-                    </div>
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 mt-4 border-t border-slate-100">
+                        <div className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 bg-slate-50/80 w-full sm:w-auto shadow-sm">
+                            <input type="checkbox" id="useInternal" checked={useInternalData} onChange={e => setUseInternalData(e.target.checked)} className="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500" />
+                            <label htmlFor="useInternal" className="text-[11px] font-bold uppercase tracking-wider text-slate-700 cursor-pointer">Sử dụng Tài liệu nội bộ</label>
+                        </div>
 
-                    <button onClick={handleGenerate} disabled={loading || !formData.subType} className="w-full py-5 bg-sky-600 text-white font-black uppercase tracking-widest rounded-2xl hover:bg-sky-700 disabled:opacity-50 disabled:bg-slate-300 transition-all flex items-center justify-center gap-3 shadow-xl shadow-sky-200">
-                        {loading ? <Loader2 className="animate-spin" /> : <><ShieldCheck size={20}/> Khởi tạo hồ sơ chuyên nghiệp</>}
-                    </button>
+                        <button onClick={handleGenerate} disabled={loading || !formData.subType} className="w-full sm:w-auto px-8 py-4 bg-slate-900 text-white font-bold uppercase tracking-widest rounded-xl hover:bg-sky-600 hover:shadow-lg hover:shadow-sky-500/20 disabled:opacity-50 disabled:bg-slate-300 transition-all flex items-center justify-center gap-2">
+                            {loading ? <Loader2 className="animate-spin" size={18} /> : <ShieldCheck size={18}/>}
+                            {loading ? "Đang xử lý phân tích..." : "Tạo Hồ Sơ Mới"}
+                        </button>
+                    </div>
                 </div>
             </div>
           </div>
@@ -1229,8 +1242,6 @@ Chỉ trả về JSON, không giải thích thêm.`,
       </footer>
 
       <style dangerouslySetInnerHTML={{ __html: `
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Noto+Serif:wght@400;700&display=swap');
-        
         @media print {
             @page { 
                 size: A4; 
@@ -1265,7 +1276,6 @@ Chỉ trả về JSON, không giải thích thêm.`,
 
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .admin-body { font-family: 'Noto Serif', serif; }
-        h1, h2, h3, h4, button, label { font-family: 'Plus Jakarta Sans', sans-serif; }
       `}} />
     </div>
   );
@@ -1273,29 +1283,33 @@ Chỉ trả về JSON, không giải thích thêm.`,
 
 const Header = ({ currentUser, onLogout }: {currentUser: any, onLogout: () => void}) => {
   return (
-  <nav className="bg-[#0c4a6e] text-white p-4 sticky top-0 z-50 shadow-lg no-print">
-    <div className="container mx-auto flex justify-between items-center">
-      <div className="flex items-center gap-3">
-        <div className="bg-white p-2 rounded-xl shadow-inner shadow-sky-900/20"><HardHat size={22} className="text-[#0ea5e9]" /></div>
+  <nav className="bg-white/80 backdrop-blur-xl border-b border-slate-200/60 sticky top-0 z-50 no-print transition-all">
+    <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+      <div className="flex items-center gap-4">
+        <div className="bg-slate-900 p-2.5 rounded-xl shadow-md ring-1 ring-slate-900/5">
+            <HardHat size={20} className="text-sky-400" />
+        </div>
         <div>
-          <h1 className="font-extrabold text-xl uppercase tracking-tighter leading-none">PHỐ XANH <span className="text-sky-400">AI</span></h1>
-          <p className="text-[9px] text-sky-200/60 uppercase font-black tracking-widest mt-1">Hệ Thống Quản Trị Nhà Thầu 5.0</p>
+          <h1 className="font-display font-extrabold text-[1.35rem] tracking-tight leading-none text-slate-900">
+            PHỐ XANH <span className="text-sky-500 bg-sky-50/50 px-1.5 rounded-md border border-sky-100 ml-0.5">AI</span>
+          </h1>
+          <p className="text-[9px] text-slate-500 uppercase font-bold tracking-[0.2em] mt-1.5">Hệ Thống Quản Trị Nhà Thầu</p>
         </div>
       </div>
       <div className="flex items-center gap-4">
         {localStorage.getItem('phoxanh_api_key') && (
           <button 
             onClick={onLogout}
-            className="hidden md:block px-4 py-2 bg-red-600/20 hover:bg-red-600/40 rounded-xl text-xs font-bold transition-all border border-red-400/30 text-red-100"
+            className="hidden md:flex items-center gap-2 px-4 py-2 bg-slate-50/50 hover:bg-red-50 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all border border-slate-200 hover:border-red-200 hover:text-red-600 text-slate-500 shadow-sm"
             title="Đăng xuất và xóa API Key"
           >
             Đăng xuất
           </button>
         )}
         {currentUser && (
-          <div className="hidden md:flex bg-white/10 backdrop-blur-md px-4 py-2 rounded-2xl text-[10px] border border-white/10 text-white font-bold items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"></div>
-            ID: {currentUser.uid}
+          <div className="hidden md:flex bg-emerald-50/50 px-4 py-2 rounded-xl text-[10px] uppercase tracking-wider border border-emerald-100 text-emerald-700 font-bold items-center gap-3 shadow-sm">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse"></div>
+            Online
           </div>
         )}
       </div>

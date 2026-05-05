@@ -14,7 +14,9 @@ export const MarketPrices = () => {
   const fetchPrices = async () => {
     setIsLoading(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const apiKey = localStorage.getItem('phoxanh_api_key');
+      if (!apiKey) throw new Error("Missing API Key");
+      const ai = new GoogleGenAI({ apiKey });
       const prompt = `Hãy ước tính đơn giá thị trường trung bình hiện tại (VNĐ/m2) cho loại hình công trình "${buildingType}" tại khu vực "${location}".
 Trả về định dạng JSON chính xác với các trường sau (chỉ trả về số nguyên, không có dấu phẩy hay chữ):
 {
