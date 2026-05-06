@@ -19,6 +19,8 @@ import * as htmlToImage from 'html-to-image';
 import jsPDF from 'jspdf';
 import { WorkflowView } from './components/WorkflowView';
 import { MarketPrices } from './components/MarketPrices';
+import { ProjectsView } from './components/ProjectsView';
+import { ArchitectureLibrary } from './components/ArchitectureLibrary';
 
 declare global {
   interface Window {
@@ -413,7 +415,7 @@ const DocumentTemplate = React.forwardRef(({ data }: {data: any}, ref: any) => {
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('phoxanh_api_key'));
   const [user, setUser] = useState<any>(null);
-  const [view, setView] = useState('home');
+  const [view, setView] = useState<'home' | 'generator' | 'result' | 'internal' | 'market' | 'workflow' | 'projects' | 'library'>('home');
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
   const [result, setResult] = useState<any>(null);
@@ -928,6 +930,12 @@ Chỉ trả về JSON, không giải thích thêm.`,
           <button onClick={() => { setView('market'); setResult(null); }} className={`px-4 py-3 md:px-8 md:py-5 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${view === 'market' ? 'border-sky-500 text-sky-600 bg-sky-50/30' : 'border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50'}`}>
             <TrendingUp size={16}/> Đơn giá thị trường
           </button>
+          <button onClick={() => { setView('projects'); setResult(null); }} className={`px-4 py-3 md:px-8 md:py-5 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${view === 'projects' ? 'border-sky-500 text-sky-600 bg-sky-50/30' : 'border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50'}`}>
+            <Briefcase size={16}/> Dự án đã thực hiện
+          </button>
+          <button onClick={() => { setView('library'); setResult(null); }} className={`px-4 py-3 md:px-8 md:py-5 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${view === 'library' ? 'border-sky-500 text-sky-600 bg-sky-50/30' : 'border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50'}`}>
+            <ImageIcon size={16}/> Thư viện kiến trúc
+          </button>
         </div>
       </div>
 
@@ -1038,6 +1046,14 @@ Chỉ trả về JSON, không giải thích thêm.`,
 
         {view === 'market' && (
             <MarketPrices />
+        )}
+
+        {view === 'projects' && (
+            <ProjectsView isAuthenticated={isAuthenticated} />
+        )}
+
+        {view === 'library' && (
+            <ArchitectureLibrary isAuthenticated={isAuthenticated} />
         )}
 
         {view === 'generator' && (
