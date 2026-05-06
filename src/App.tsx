@@ -124,7 +124,7 @@ const getTimeAgo = (timestamp: any) => {
 
 // --- COMPONENTS & TEMPLATES ---
 
-const LoginScreen = ({ onLogin }: { onLogin: (key: string) => void }) => {
+const LoginScreen = ({ onLogin, onGuestLogin }: { onLogin: (key: string) => void, onGuestLogin: () => void }) => {
     const [key, setKey] = useState('');
     
     const handleSubmit = (e: React.FormEvent) => {
@@ -150,14 +150,13 @@ const LoginScreen = ({ onLogin }: { onLogin: (key: string) => void }) => {
                     Hệ Thống Quản Trị Nhà Thầu 5.0
                 </p>
                 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2 ml-1">
                             Google Gemini API Key
                         </label>
                         <input 
                             type="password" 
-                            required 
                             className="w-full p-4 bg-slate-50/50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-sky-500/20 focus:border-sky-500 font-mono text-sm transition-all shadow-inner"
                             placeholder="AIzaSy..."
                             value={key}
@@ -170,6 +169,10 @@ const LoginScreen = ({ onLogin }: { onLogin: (key: string) => void }) => {
                     </div>
                     <button type="submit" className="w-full h-14 bg-slate-900 hover:bg-sky-600 text-white font-bold rounded-2xl transition-all shadow-lg hover:shadow-sky-500/25 uppercase tracking-widest text-[12px] flex justify-center items-center gap-3">
                         <span>Đăng nhập hệ thống</span>
+                        <ArrowRight size={16} />
+                    </button>
+                    <button type="button" onClick={onGuestLogin} className="w-full h-14 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-2xl transition-all shadow-sm border border-slate-200 uppercase tracking-widest text-[12px] flex justify-center items-center gap-3">
+                        <span>Truy cập khách (Chỉ xem)</span>
                         <ArrowRight size={16} />
                     </button>
                 </form>
@@ -414,6 +417,7 @@ const DocumentTemplate = React.forwardRef(({ data }: {data: any}, ref: any) => {
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('phoxanh_api_key'));
+  const [isGuest, setIsGuest] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [view, setView] = useState<'home' | 'generator' | 'result' | 'internal' | 'market' | 'workflow' | 'projects' | 'library'>('home');
   const [loading, setLoading] = useState(false);
@@ -467,11 +471,14 @@ export default function App() {
     */
   }, []);
 
-  if (!isAuthenticated) {
-    return <LoginScreen onLogin={(key) => {
+  if (!isAuthenticated && !isGuest) {
+    return <LoginScreen 
+      onLogin={(key) => {
         localStorage.setItem('phoxanh_api_key', key);
         setIsAuthenticated(true);
-    }} />
+      }}
+      onGuestLogin={() => setIsGuest(true)}
+    />
   }
 
   const handleExportPDF = async () => {
@@ -911,7 +918,8 @@ Chỉ trả về JSON, không giải thích thêm.`,
       <Header currentUser={user} onLogout={() => {
           localStorage.removeItem('phoxanh_api_key');
           setIsAuthenticated(false);
-      }} />
+          setIsGuest(false);
+      }} isAuthenticated={isAuthenticated} isGuest={isGuest} />
       
       <div className="bg-white/80 backdrop-blur-xl border-b border-slate-200/50 sticky top-[68px] z-40 no-print shadow-sm">
         <div className="container mx-auto flex overflow-x-auto scrollbar-hide">
@@ -968,7 +976,7 @@ Chỉ trả về JSON, không giải thích thêm.`,
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                     {[
                         { num: "15+", label: "Năm kinh nghiệm", icon: Briefcase },
-                        { num: "500+", label: "Dự án hoàn thành", icon: Building2 },
+                        { num: "+100", label: "Căn", icon: Building2 },
                         { num: "100%", label: "Đúng tiến độ duyệt", icon: CheckCircle2 },
                         { num: "24/7", label: "Hỗ trợ khách hàng", icon: Users }
                     ].map((stat, i) => {
@@ -1210,9 +1218,9 @@ Chỉ trả về JSON, không giải thích thêm.`,
                             <label htmlFor="useInternal" className="text-[11px] font-bold uppercase tracking-wider text-slate-700 cursor-pointer">Sử dụng Tài liệu nội bộ</label>
                         </div>
 
-                        <button onClick={handleGenerate} disabled={loading || !formData.subType} className="w-full sm:w-auto px-8 py-4 bg-slate-900 text-white font-bold uppercase tracking-widest rounded-xl hover:bg-sky-600 hover:shadow-lg hover:shadow-sky-500/20 disabled:opacity-50 disabled:bg-slate-300 transition-all flex items-center justify-center gap-2">
+                        <button onClick={handleGenerate} disabled={loading || !formData.subType || !isAuthenticated} className="w-full sm:w-auto px-8 py-4 bg-slate-900 text-white font-bold uppercase tracking-widest rounded-xl hover:bg-sky-600 hover:shadow-lg hover:shadow-sky-500/20 disabled:opacity-50 disabled:bg-slate-300 transition-all flex items-center justify-center gap-2">
                             {loading ? <Loader2 className="animate-spin" size={18} /> : <ShieldCheck size={18}/>}
-                            {loading ? "Đang xử lý phân tích..." : "Tạo Hồ Sơ Mới"}
+                            {loading ? "Đang xử lý phân tích..." : (!isAuthenticated ? "Vui lòng đăng nhập để tạo hồ sơ" : "Tạo Hồ Sơ Mới")}
                         </button>
                     </div>
                 </div>
@@ -1356,7 +1364,7 @@ Chỉ trả về JSON, không giải thích thêm.`,
   );
 }
 
-const Header = ({ currentUser, onLogout }: {currentUser: any, onLogout: () => void}) => {
+const Header = ({ currentUser, onLogout, isAuthenticated, isGuest }: {currentUser: any, onLogout: () => void, isAuthenticated: boolean, isGuest: boolean}) => {
   return (
   <nav className="bg-white/80 backdrop-blur-xl border-b border-slate-200/60 sticky top-0 z-50 no-print transition-all">
     <div className="container mx-auto px-6 py-4 flex justify-between items-center">
@@ -1372,7 +1380,7 @@ const Header = ({ currentUser, onLogout }: {currentUser: any, onLogout: () => vo
         </div>
       </div>
       <div className="flex items-center gap-4">
-        {localStorage.getItem('phoxanh_api_key') && (
+        {isAuthenticated ? (
           <button 
             onClick={onLogout}
             className="hidden md:flex items-center gap-2 px-4 py-2 bg-slate-50/50 hover:bg-red-50 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all border border-slate-200 hover:border-red-200 hover:text-red-600 text-slate-500 shadow-sm"
@@ -1380,7 +1388,15 @@ const Header = ({ currentUser, onLogout }: {currentUser: any, onLogout: () => vo
           >
             Đăng xuất
           </button>
-        )}
+        ) : isGuest ? (
+          <button 
+            onClick={onLogout}
+            className="hidden md:flex items-center gap-2 px-4 py-2 bg-sky-50/50 hover:bg-sky-100 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all border border-sky-200 text-sky-600 shadow-sm"
+            title="Thoát chế độ Khách"
+          >
+            Đăng nhập (Nhập API Key)
+          </button>
+        ) : null}
         {currentUser && (
           <div className="hidden md:flex bg-emerald-50/50 px-4 py-2 rounded-xl text-[10px] uppercase tracking-wider border border-emerald-100 text-emerald-700 font-bold items-center gap-3 shadow-sm">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse"></div>
