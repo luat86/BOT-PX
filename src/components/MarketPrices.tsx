@@ -17,15 +17,12 @@ export const MarketPrices = () => {
       const apiKey = localStorage.getItem('phoxanh_api_key');
       if (!apiKey) throw new Error("Missing API Key");
       const ai = new GoogleGenAI({ apiKey });
-      const prompt = `Hãy ước tính đơn giá thị trường trung bình hiện tại (VNĐ/m2) cho loại hình công trình "${buildingType}" tại khu vực "${location}".
+      const prompt = `Hãy ước tính đơn giá thị trường trung bình hiện tại (VNĐ/m2) chia làm 3 mức độ (Trung bình, Khá, Tốt) cho loại hình công trình "${buildingType}" tại khu vực "${location}".
 Trả về định dạng JSON chính xác với các trường sau (chỉ trả về số nguyên, không có dấu phẩy hay chữ):
 {
-  "design": <đơn giá thiết kế kiến trúc & nội thất>,
-  "construction": <đơn giá thi công phần thô & nhân công hoàn thiện>,
-  "roughMaterials": <đơn giá vật tư thô>,
-  "finishing": <đơn giá vật tư hoàn thiện (mức khá)>,
-  "mep": <đơn giá thi công cơ điện (MEP)>,
-  "turnkey": <đơn giá xây nhà trọn gói (chìa khóa trao tay)>,
+  "turnkeyAverage": <đơn giá xây nhà trọn gói - Mức Trung bình>,
+  "turnkeyGood": <đơn giá xây nhà trọn gói - Mức Khá>,
+  "turnkeyExcellent": <đơn giá xây nhà trọn gói - Mức Tốt (Cao cấp)>,
   "trend": "<xu hướng giá so với quý trước: tăng/giảm/ổn định>",
   "notes": "<ghi chú ngắn gọn về tình hình thị trường>"
 }
@@ -104,37 +101,23 @@ Chỉ trả về JSON, không giải thích thêm.`;
 
         {prices && (
           <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                <div className="text-slate-500 text-sm font-bold mb-2">Đơn giá Thiết kế</div>
-                <div className="text-2xl font-black text-slate-800">{formatPrice(prices.design)}</div>
-              </div>
-              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                <div className="text-slate-500 text-sm font-bold mb-2">Thi công Phần thô & Nhân công</div>
-                <div className="text-2xl font-black text-slate-800">{formatPrice(prices.construction)}</div>
-              </div>
-              <div className="bg-sky-50 p-5 rounded-xl border border-sky-200 shadow-sm flex flex-col justify-between">
-                <div className="text-sky-700 text-sm font-bold mb-2">Xây nhà Trọn gói (Chìa khóa trao tay)</div>
-                <div className="text-2xl font-black text-sky-700">{formatPrice(prices.turnkey)}</div>
-              </div>
-            </div>
-
-            <div className="bg-slate-50 p-6 rounded-xl border border-slate-200">
-              <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <DollarSign size={18} className="text-emerald-600" /> Chi tiết Vật tư & Cơ điện
+            <div className="bg-slate-50 p-6 sm:p-8 rounded-xl border border-slate-200">
+              <h3 className="font-bold text-slate-800 mb-6 flex items-center justify-center gap-2 text-lg uppercase tracking-wide">
+                <DollarSign size={20} className="text-emerald-600" /> Đơn giá Xây nhà Trọn gói (Chìa khóa trao tay)
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-white p-4 rounded-lg border border-slate-200">
-                  <div className="text-slate-500 text-xs font-bold uppercase mb-1">Vật tư thô</div>
-                  <div className="text-lg font-bold text-slate-800">{formatPrice(prices.roughMaterials)}</div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between items-center text-center hover:border-sky-200 transition-colors">
+                  <div className="text-slate-500 text-sm font-bold uppercase mb-2">Mức Trung bình</div>
+                  <div className="text-2xl font-bold text-slate-800">{formatPrice(prices.turnkeyAverage)}</div>
                 </div>
-                <div className="bg-white p-4 rounded-lg border border-slate-200">
-                  <div className="text-slate-500 text-xs font-bold uppercase mb-1">Vật tư hoàn thiện</div>
-                  <div className="text-lg font-bold text-slate-800">{formatPrice(prices.finishing)}</div>
+                <div className="bg-sky-50 p-6 rounded-xl border border-sky-300 shadow-md flex flex-col justify-between items-center text-center transform md:-translate-y-2 relative">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-sky-600 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap shadow-sm">Phổ biến</div>
+                  <div className="text-sky-700 text-sm font-bold uppercase mb-2 mt-2">Mức Khá</div>
+                  <div className="text-3xl font-black text-sky-700">{formatPrice(prices.turnkeyGood)}</div>
                 </div>
-                <div className="bg-white p-4 rounded-lg border border-slate-200">
-                  <div className="text-slate-500 text-xs font-bold uppercase mb-1">Thi công Cơ điện (MEP)</div>
-                  <div className="text-lg font-bold text-slate-800">{formatPrice(prices.mep)}</div>
+                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between items-center text-center hover:border-amber-200 transition-colors">
+                  <div className="text-slate-500 text-sm font-bold uppercase mb-2">Mức Tốt (Cao cấp)</div>
+                  <div className="text-2xl font-bold text-slate-800">{formatPrice(prices.turnkeyExcellent)}</div>
                 </div>
               </div>
             </div>

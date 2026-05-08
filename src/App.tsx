@@ -849,9 +849,10 @@ ${internalData.substring(0, 15000)}`
                 }
             } else if (formData.priceSource === 'market' || formData.priceSource === 'ai_estimate') {
                 try {
+                    const priceTarget = formData.priceSource === 'market' ? "hình thức Thi công Trọn gói (Chìa khóa trao tay)" : `gói "${targetSubType}"`;
                     const priceResponse = await getAIClient().models.generateContent({
                         model: "gemini-3-flash-preview",
-                        contents: `Hãy ước tính ĐƠN GIÁ THI CÔNG CHUẨN (VNĐ/m2) trung bình trên thị trường hiện nay áp dụng cho loại công trình "${formData.buildingType}" tại "${formData.location}" và gói "${targetSubType}".
+                        contents: `Hãy ước tính ĐƠN GIÁ THI CÔNG CHUẨN (VNĐ/m2) trung bình trên thị trường hiện nay áp dụng cho loại công trình "${formData.buildingType}" tại "${formData.location}" và ${priceTarget}.
 Yêu cầu:
 - CHỈ trả về MỘT CON SỐ DUY NHẤT (ví dụ: 6500000). 
 - KHÔNG giải thích thêm.`
@@ -1245,8 +1246,11 @@ Chỉ trả về JSON, không giải thích thêm.`,
                             {formData.priceSource === 'internal' && !internalData && (
                                 <p className="text-[10px] text-red-500 italic mt-2 flex items-center gap-1"><AlertCircle size={12}/> Vui lòng tải lên tài liệu nội bộ ở tab "Tài liệu nội bộ" trước khi sử dụng.</p>
                             )}
-                            {(formData.priceSource === 'market' || formData.priceSource === 'ai_estimate') && (
-                                <p className="text-[10px] text-slate-500 italic mt-2 ml-1">AI sẽ tự động ước tính đơn giá thị trường dựa trên loại công trình và khu vực.</p>
+                            {(formData.priceSource === 'market') && (
+                                <p className="text-[10px] text-slate-500 italic mt-2 ml-1">AI sẽ tự động ước tính đơn giá thị trường (trọn gói chìa khóa trao tay) dựa trên loại công trình và khu vực.</p>
+                            )}
+                            {(formData.priceSource === 'ai_estimate') && (
+                                <p className="text-[10px] text-slate-500 italic mt-2 ml-1">AI sẽ tự động ước tính đơn giá thị trường dựa trên loại công trình, khu vực và gói thầu.</p>
                             )}
                         </div>
                     )}
