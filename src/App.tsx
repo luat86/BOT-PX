@@ -130,7 +130,11 @@ const LoginScreen = ({ onLogin, onGuestLogin }: { onLogin: (key: string) => void
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (key.trim()) {
-            onLogin(key.trim());
+            if (key.trim() === '090.6381-186' || key.trim().startsWith('AIzaSy') || key.trim().length > 10) {
+                onLogin(key.trim());
+            } else {
+                alert('Mã đăng nhập không hợp lệ!');
+            }
         }
     };
 
@@ -153,22 +157,22 @@ const LoginScreen = ({ onLogin, onGuestLogin }: { onLogin: (key: string) => void
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2 ml-1">
-                            Google Gemini API Key
+                            Mã đăng nhập / API Key
                         </label>
                         <input 
                             type="password" 
                             className="w-full p-4 bg-slate-50/50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-sky-500/20 focus:border-sky-500 font-mono text-sm transition-all shadow-inner"
-                            placeholder="AIzaSy..."
+                            placeholder="Nhập mã quản lý hoặc Google Gemini API Key..."
                             value={key}
                             onChange={e => setKey(e.target.value)}
                         />
                         <p className="text-[10px] text-slate-400 mt-3 flex items-start gap-2 leading-relaxed ml-1">
                             <Info size={14} className="min-w-max text-sky-400" />
-                            Mã khóa được mã hóa và lưu trữ an toàn ngay trên trình duyệt, kết nối trực tiếp với máy tính chủ Google.
+                            Sử dụng mã quản lý hoặc API Key của Google để truy cập đầy đủ tính năng tạo hồ sơ.
                         </p>
                     </div>
                     <button type="submit" className="w-full h-14 bg-slate-900 hover:bg-sky-600 text-white font-bold rounded-2xl transition-all shadow-lg hover:shadow-sky-500/25 uppercase tracking-widest text-[12px] flex justify-center items-center gap-3">
-                        <span>Đăng nhập hệ thống</span>
+                        <span>Đăng nhập hệ thống (Quản lý)</span>
                         <ArrowRight size={16} />
                     </button>
                     <button type="button" onClick={onGuestLogin} className="w-full h-14 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-2xl transition-all shadow-sm border border-slate-200 uppercase tracking-widest text-[12px] flex justify-center items-center gap-3">
@@ -485,47 +489,74 @@ export default function App() {
     if (!result) return;
     setExporting(true);
     try {
-        const isPricing = result.mode === 'pricing' || result.title?.includes('Báo giá');
-        const elementIds = isPricing ? ['capture-page-1', 'capture-page-2'] : ['capture-doc'];
+    const isPricing = result.mode === 'pricing' || result.title?.includes('Báo giá');
+    // Ensure we only query elements inside document-content-wrapper to avoid duplicates from print duplicates
+    const wrapper = document.getElementById('document-content-wrapper');
+    const elementIds = isPricing && wrapper 
+        ? Array.from(wrapper.querySelectorAll('[id^="capture-page-"]')).map(el => el.id).sort() 
+        : ['capture-doc'];
+    
+    let pdf: jsPDF | null = null;
+    const pdfWidth = 210;
+    const pdfA4Height = 297;
+
+    for (let i = 0; i < elementIds.length; i++) {
+        const id = elementIds[i];
+        const element = wrapper ? wrapper.querySelector(`#${id}`) as HTMLElement : document.getElementById(id);
+        if (!element) continue;
+
+        const elWidth = element.offsetWidth || 794;
+        const elHeight = element.offsetHeight || 1123;
         
-        let pdf: jsPDF | null = null;
-        const pdfWidth = 210;
+        const canvas = await htmlToImage.toCanvas(element, {
+            pixelRatio: 2,
+            backgroundColor: "#ffffff",
+            width: elWidth,
+            height: elHeight,
+            style: {
+                margin: '0',
+                transform: 'none' // remove any scaling
+            }
+        });
 
-        for (let i = 0; i < elementIds.length; i++) {
-            const id = elementIds[i];
-            const element = document.getElementById(id);
-            if (!element) continue;
+        // Determine if we need to slice the canvas (if height is significantly larger than A4 proportion)
+        const a4HeightPx = (elWidth * pdfA4Height) / pdfWidth;
+        const numPages = Math.ceil(elHeight / a4HeightPx);
 
-            const elWidth = element.offsetWidth || 794;
-            const elHeight = element.offsetHeight || 1123;
-            // Calculate proportional height to prevent text from being squished / distorted
-            const pdfHeight = (elHeight * pdfWidth) / elWidth;
-
-            const canvas = await htmlToImage.toCanvas(element, {
-                pixelRatio: 2,
-                backgroundColor: "#ffffff",
-                width: elWidth,
-                height: elHeight,
-                style: {
-                    margin: '0',
-                    transform: 'none' // remove any scaling
-                }
-            });
+        for (let p = 0; p < numPages; p++) {
+            const canvasChunk = document.createElement('canvas');
+            canvasChunk.width = canvas.width;
             
-            const imgData = canvas.toDataURL('image/jpeg', 1.0);
+            const srcY = p * a4HeightPx * 2;
+            let sHeight = a4HeightPx * 2;
+            if (srcY + sHeight > canvas.height) {
+                sHeight = canvas.height - srcY;
+            }
+            canvasChunk.height = sHeight;
+            
+            const ctx = canvasChunk.getContext('2d');
+            if (ctx) {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvasChunk.width, canvasChunk.height);
+                ctx.drawImage(canvas, 0, srcY, canvas.width, sHeight, 0, 0, canvas.width, sHeight);
+            }
+            
+            const chunkImgData = canvasChunk.toDataURL('image/jpeg', 1.0);
+            const currentPdfHeight = (sHeight / 2 * pdfWidth) / elWidth;
             
             if (!pdf) {
                 pdf = new jsPDF({
                     orientation: 'portrait',
                     unit: 'mm',
-                    format: [pdfWidth, pdfHeight]
+                    format: [pdfWidth, pdfA4Height]
                 });
             } else {
-                pdf.addPage([pdfWidth, pdfHeight], 'portrait');
+                pdf.addPage([pdfWidth, currentPdfHeight < pdfA4Height ? pdfA4Height : currentPdfHeight], 'portrait');
             }
             
-            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+            pdf.addImage(chunkImgData, 'JPEG', 0, 0, pdfWidth, currentPdfHeight);
         }
+    }
         
         if (pdf) {
             pdf.save(`${result.title.replace(/\s+/g, '_')}.pdf`);
@@ -666,6 +697,11 @@ ${result.content}`;
     const key = localStorage.getItem('phoxanh_api_key');
     if (!key) {
       alert("Hệ thống chưa thấy đăng nhập. Vui lòng đăng nhập bằng API Key.");
+      return;
+    }
+
+    if (key === '090.6381-186') {
+      alert("Tính năng tạo hồ sơ bằng AI yêu cầu phải có Google Gemini API Key. Đăng nhập hiện tại chỉ có quyền quản lý thư viện và dự án.");
       return;
     }
 
@@ -919,6 +955,14 @@ Chỉ trả về JSON, không giải thích thêm.`,
           localStorage.removeItem('phoxanh_api_key');
           setIsAuthenticated(false);
           setIsGuest(false);
+      }} onLogin={(key: string) => {
+          localStorage.setItem('phoxanh_api_key', key);
+          setIsAuthenticated(true);
+          setIsGuest(false);
+      }} onGuestLogin={() => {
+          localStorage.removeItem('phoxanh_api_key');
+          setIsAuthenticated(false);
+          setIsGuest(true);
       }} isAuthenticated={isAuthenticated} isGuest={isGuest} />
       
       <div className="bg-white/80 backdrop-blur-xl border-b border-slate-200/50 sticky top-[68px] z-40 no-print shadow-sm">
@@ -1057,11 +1101,11 @@ Chỉ trả về JSON, không giải thích thêm.`,
         )}
 
         {view === 'projects' && (
-            <ProjectsView isAuthenticated={isAuthenticated} />
+            <ProjectsView isAuthenticated={localStorage.getItem('phoxanh_api_key') === '090.6381-186'} />
         )}
 
         {view === 'library' && (
-            <ArchitectureLibrary isAuthenticated={isAuthenticated} />
+            <ArchitectureLibrary isAuthenticated={localStorage.getItem('phoxanh_api_key') === '090.6381-186'} />
         )}
 
         {view === 'generator' && (
@@ -1364,7 +1408,9 @@ Chỉ trả về JSON, không giải thích thêm.`,
   );
 }
 
-const Header = ({ currentUser, onLogout, isAuthenticated, isGuest }: {currentUser: any, onLogout: () => void, isAuthenticated: boolean, isGuest: boolean}) => {
+const Header = ({ currentUser, onLogout, onLogin, onGuestLogin, isAuthenticated, isGuest }: {currentUser: any, onLogout: () => void, onLogin: (key: string) => void, onGuestLogin: () => void, isAuthenticated: boolean, isGuest: boolean}) => {
+  const isAdmin = localStorage.getItem('phoxanh_api_key') === '090.6381-186';
+  
   return (
   <nav className="bg-white/80 backdrop-blur-xl border-b border-slate-200/60 sticky top-0 z-50 no-print transition-all">
     <div className="container mx-auto px-6 py-4 flex justify-between items-center">
@@ -1380,23 +1426,51 @@ const Header = ({ currentUser, onLogout, isAuthenticated, isGuest }: {currentUse
         </div>
       </div>
       <div className="flex items-center gap-4">
-        {isAuthenticated ? (
+        <div className="hidden md:flex bg-slate-100 rounded-xl p-1 border border-slate-200 shadow-inner">
           <button 
-            onClick={onLogout}
-            className="hidden md:flex items-center gap-2 px-4 py-2 bg-slate-50/50 hover:bg-red-50 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all border border-slate-200 hover:border-red-200 hover:text-red-600 text-slate-500 shadow-sm"
-            title="Đăng xuất và xóa API Key"
+            onClick={() => {
+              if (isAdmin) {
+                onGuestLogin();
+              }
+            }}
+            className={`px-4 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all ${
+              !isAdmin
+                ? "bg-white text-slate-800 shadow-sm" 
+                : "text-slate-500 hover:text-slate-700"
+            }`}
           >
-            Đăng xuất
+            Chế độ Xem
           </button>
-        ) : isGuest ? (
           <button 
-            onClick={onLogout}
-            className="hidden md:flex items-center gap-2 px-4 py-2 bg-sky-50/50 hover:bg-sky-100 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all border border-sky-200 text-sky-600 shadow-sm"
-            title="Thoát chế độ Khách"
+            onClick={() => {
+              if (!isAdmin) {
+                 const key = prompt("Vui lòng nhập mật khẩu Quản lý:");
+                 if (key === '090.6381-186') {
+                     onLogin(key);
+                 } else if (key) {
+                     alert("Mật khẩu không đúng.");
+                 }
+              }
+            }}
+            className={`px-4 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all ${
+              isAdmin
+                ? "bg-white text-sky-600 shadow-sm border border-sky-100" 
+                : "text-slate-500 hover:text-slate-700"
+            }`}
           >
-            Đăng nhập (Nhập API Key)
+            Chế độ Quản lý
           </button>
-        ) : null}
+        </div>
+        
+        {isAuthenticated && !isAdmin && (
+           <button 
+             onClick={onLogout}
+             className="hidden md:flex items-center gap-2 px-4 py-2 bg-slate-50/50 hover:bg-red-50 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all border border-slate-200 hover:border-red-200 hover:text-red-600 text-slate-500 shadow-sm"
+             title="Đăng xuất và xóa API Key"
+           >
+             Thoát API Key
+           </button>
+        )}
         {currentUser && (
           <div className="hidden md:flex bg-emerald-50/50 px-4 py-2 rounded-xl text-[10px] uppercase tracking-wider border border-emerald-100 text-emerald-700 font-bold items-center gap-3 shadow-sm">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse"></div>
