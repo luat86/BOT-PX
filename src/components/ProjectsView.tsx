@@ -59,6 +59,8 @@ export const ProjectsView = ({ isAuthenticated }: { isAuthenticated: boolean }) 
         status: 'Đã bàn giao',
     });
 
+    const [deletingId, setDeletingId] = useState<number | null>(null);
+
     useEffect(() => {
         const saved = localStorage.getItem('phoxanh_projects');
         if (saved) {
@@ -75,7 +77,6 @@ export const ProjectsView = ({ isAuthenticated }: { isAuthenticated: boolean }) 
     };
 
     const handleDelete = (id: number) => {
-        if (!confirm('Bạn có chắc chắn muốn xóa dự án này?')) return;
         const updated = projects.filter(p => p.id !== id);
         saveProjects(updated);
     };
@@ -203,11 +204,20 @@ export const ProjectsView = ({ isAuthenticated }: { isAuthenticated: boolean }) 
                             
                             {isAuthenticated && (
                                 <button 
-                                    onClick={(e) => { e.stopPropagation(); handleDelete(project.id); }} 
-                                    className="absolute inset-0 m-auto w-12 h-12 bg-red-500/90 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-600 hover:scale-110 transition-all shadow-xl z-20 backdrop-blur-sm"
+                                    onClick={(e) => { 
+                                        e.stopPropagation(); 
+                                        if (deletingId === project.id) {
+                                            handleDelete(project.id);
+                                            setDeletingId(null);
+                                        } else {
+                                            setDeletingId(project.id);
+                                            setTimeout(() => setDeletingId(null), 3000);
+                                        }
+                                    }} 
+                                    className={`absolute inset-0 m-auto ${deletingId === project.id ? 'w-24 h-10 bg-red-600 rounded-xl opacity-100' : 'w-12 h-12 bg-red-500/90 rounded-full opacity-0 group-hover:opacity-100 hover:scale-110'} text-white flex items-center justify-center transition-all shadow-xl z-20 backdrop-blur-sm`}
                                     title="Xóa dự án"
                                 >
-                                    <Trash2 size={20} />
+                                    {deletingId === project.id ? <span className="text-[10px] font-bold uppercase tracking-wider">Xác nhận</span> : <Trash2 size={20} />}
                                 </button>
                             )}
                         </div>

@@ -10,6 +10,26 @@ const INITIAL_IMAGES = [
     { id: 4, style: "Hiện đại", title: "Mặt tiền nhà phố", img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80" },
     { id: 5, style: "Indochine", title: "Phòng khách Indochine", img: "https://images.unsplash.com/photo-1604147706283-d7119b5b822c?auto=format&fit=crop&q=80" },
     { id: 6, style: "Tân cổ điển", title: "Sảnh đón khách", img: "https://images.unsplash.com/photo-1599809275671-b5942cabc7a2?auto=format&fit=crop&q=80" },
+    { id: 7, style: "Bắc Âu (Scandinavian)", title: "Góc làm việc thư giãn", img: "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&q=80" },
+    { id: 8, style: "Hiện đại", title: "Phòng tắm kính", img: "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&q=80" },
+    { id: 9, style: "Tối giản (Minimalism)", title: "Không gian thiền", img: "https://images.unsplash.com/photo-1629813293813-f92a4e92b34a?auto=format&fit=crop&q=80" },
+    { id: 10, style: "Indochine", title: "Phòng ngủ phong cách Á Đông", img: "https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?auto=format&fit=crop&q=80" },
+    { id: 11, style: "Tân cổ điển", title: "Phòng ăn sang trọng", img: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&q=80" },
+    { id: 12, style: "Bắc Âu (Scandinavian)", title: "Phòng khách ngập nắng", img: "https://images.unsplash.com/photo-1583847268964-b28ce8f3121b?auto=format&fit=crop&q=80" },
+    { id: 13, style: "Tân cổ điển", title: "Biệt thự ngoại ô", img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80" },
+    { id: 14, style: "Hiện đại", title: "Căn hộ Penthouse", img: "https://images.unsplash.com/photo-1600607688969-a5bfcd64bd40?auto=format&fit=crop&q=80" },
+    { id: 15, style: "Tối giản (Minimalism)", title: "Nhà vườn sinh thái", img: "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&q=80" },
+    { id: 16, style: "Indochine", title: "Ban công nhiệt đới", img: "https://images.unsplash.com/photo-1598928506311-c55dd580e557?auto=format&fit=crop&q=80" },
+    { id: 17, style: "Tân cổ điển", title: "Cầu thang nghệ thuật", img: "https://images.unsplash.com/photo-1560448205-1dfdd186c321?auto=format&fit=crop&q=80" },
+    { id: 18, style: "Hiện đại", title: "Phòng bếp đảo", img: "https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&q=80" },
+    { id: 19, style: "Bắc Âu (Scandinavian)", title: "Phòng ngủ ấm áp", img: "https://images.unsplash.com/photo-1505693314120-0d443867891c?auto=format&fit=crop&q=80" },
+    { id: 20, style: "Tối giản (Minimalism)", title: "Không gian mở", img: "https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&q=80" },
+    { id: 21, style: "Indochine", title: "Sân trong biệt thự", img: "https://images.unsplash.com/photo-1588880331179-bc9b9c4aad79?auto=format&fit=crop&q=80" },
+    { id: 22, style: "Hiện đại", title: "Phòng khách Smart Home", img: "https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&q=80" },
+    { id: 23, style: "Tân cổ điển", title: "Khu vực đọc sách", img: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80" },
+    { id: 24, style: "Bắc Âu (Scandinavian)", title: "Bàn ăn gia đình", img: "https://images.unsplash.com/photo-1493863435422-77114ff0e6e7?auto=format&fit=crop&q=80" },
+    { id: 25, style: "Tối giản (Minimalism)", title: "Hiên nhà đón gió", img: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&q=80" },
+    { id: 26, style: "Indochine", title: "Phòng tắm hoài cổ", img: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80" }
 ];
 
 export const ArchitectureLibrary = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
@@ -25,10 +45,14 @@ export const ArchitectureLibrary = ({ isAuthenticated }: { isAuthenticated: bool
         style: 'Hiện đại'
     });
 
+    const [deletingId, setDeletingId] = useState<number | null>(null);
+
     useEffect(() => {
         const saved = localStorage.getItem('phoxanh_library');
         if (saved) {
-            setImages(JSON.parse(saved));
+            const parsed = JSON.parse(saved);
+            const userAdded = parsed.filter((img: any) => img.id > 100); 
+            setImages([...userAdded, ...INITIAL_IMAGES]);
         } else {
             setImages(INITIAL_IMAGES);
             localStorage.setItem('phoxanh_library', JSON.stringify(INITIAL_IMAGES));
@@ -41,7 +65,6 @@ export const ArchitectureLibrary = ({ isAuthenticated }: { isAuthenticated: bool
     };
 
     const handleDelete = (id: number) => {
-        if (!confirm('Bạn có chắc chắn muốn xóa ảnh này?')) return;
         const updated = images.filter(i => i.id !== id);
         saveImages(updated);
     };
@@ -178,11 +201,20 @@ export const ArchitectureLibrary = ({ isAuthenticated }: { isAuthenticated: bool
                         
                         {isAuthenticated && (
                             <button 
-                                onClick={(e) => { e.stopPropagation(); handleDelete(img.id); }} 
-                                className="absolute top-4 right-4 w-10 h-10 bg-red-500/90 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-600 hover:scale-110 transition-all shadow-xl z-20 backdrop-blur-sm"
+                                onClick={(e) => { 
+                                    e.stopPropagation(); 
+                                    if (deletingId === img.id) {
+                                        handleDelete(img.id);
+                                        setDeletingId(null);
+                                    } else {
+                                        setDeletingId(img.id);
+                                        setTimeout(() => setDeletingId(null), 3000);
+                                    }
+                                }} 
+                                className={`absolute top-4 right-4 ${deletingId === img.id ? 'w-auto px-4 h-10 bg-red-600 rounded-xl opacity-100' : 'w-10 h-10 bg-red-500/90 rounded-full opacity-0 group-hover:opacity-100 hover:scale-110'} text-white flex items-center justify-center transition-all shadow-xl z-20 backdrop-blur-sm`}
                                 title="Xóa ảnh"
                             >
-                                <Trash2 size={16} />
+                                {deletingId === img.id ? <span className="text-[10px] font-bold uppercase tracking-wider">Xác nhận</span> : <Trash2 size={16} />}
                             </button>
                         )}
 
