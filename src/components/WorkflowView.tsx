@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CheckCircle2, FileText, ArrowRight, DollarSign, HardHat, Home, ShieldCheck, PenTool, Ruler, Printer, Loader2 } from 'lucide-react';
+import { motion } from 'motion/react';
 import * as htmlToImage from 'html-to-image';
 import jsPDF from 'jspdf';
 
@@ -155,15 +156,22 @@ export const WorkflowView = ({ onDocumentClick }: { onDocumentClick?: (docName: 
 
       <div className="relative border-l-2 border-slate-200 ml-4 md:ml-8 space-y-12 pb-12">
         {currentSteps.map((step, index) => (
-          <div key={step.id} className="relative pl-8 md:pl-12">
+          <motion.div 
+            key={step.id} 
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5, delay: index * 0.15 }}
+            className="relative pl-8 md:pl-12"
+          >
             {/* Timeline dot */}
             <div className="absolute -left-[21px] top-1 w-10 h-10 rounded-full bg-white border-4 border-slate-100 flex items-center justify-center shadow-sm">
               {step.icon}
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
-                <span className="text-4xl font-black text-slate-100">{step.id.toString().padStart(2, '0')}</span>
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow cursor-default group">
+              <div className="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4 group-hover:border-sky-100 transition-colors">
+                <span className="text-4xl font-black text-slate-100 group-hover:text-sky-100 transition-colors">{step.id.toString().padStart(2, '0')}</span>
                 <h3 className="text-xl font-bold text-slate-800 uppercase">{step.title}</h3>
               </div>
 
@@ -175,36 +183,47 @@ export const WorkflowView = ({ onDocumentClick }: { onDocumentClick?: (docName: 
                   </h4>
                   <ul className="space-y-3">
                     {step.tasks.map((task, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                        <div className="w-1.5 h-1.5 rounded-full bg-sky-400 mt-1.5 shrink-0"></div>
+                      <motion.li 
+                        key={i} 
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.3, delay: (index * 0.15) + (i * 0.05) }}
+                        className="flex items-start gap-2 text-sm text-slate-700"
+                      >
+                        <div className="w-1.5 h-1.5 rounded-full bg-sky-400 mt-1.5 shrink-0 transition-transform hover:scale-150"></div>
                         <span>{task}</span>
-                      </li>
+                      </motion.li>
                     ))}
                   </ul>
                 </div>
 
                 {/* Documents */}
-                <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                <div className="bg-slate-50 rounded-xl p-5 border border-slate-100 hover:border-sky-200 transition-colors">
                   <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                     <FileText size={14} /> Hồ sơ quản lý chất lượng
                   </h4>
                   <ul className="space-y-3">
                     {step.documents.map((doc, i) => (
-                      <li 
+                      <motion.li 
                         key={i} 
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.3, delay: (index * 0.15) + (i * 0.05) }}
                         onClick={() => onDocumentClick && onDocumentClick(doc)}
                         className={`flex items-start gap-2 text-sm font-medium transition-colors ${onDocumentClick ? 'cursor-pointer text-sky-700 hover:text-sky-900 hover:bg-sky-100 p-2 -mx-2 rounded-lg' : 'text-slate-700'}`}
                         title={onDocumentClick ? "Nhấn để tạo văn bản này" : ""}
                       >
                         <FileText size={16} className="text-sky-600 shrink-0 mt-0.5" />
                         <span>{doc}</span>
-                      </li>
+                      </motion.li>
                     ))}
                   </ul>
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>

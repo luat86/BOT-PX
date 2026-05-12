@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Building2, MapPin, Calendar, ArrowRight, Trash2, Plus, Upload, X } from 'lucide-react';
+import { motion } from 'motion/react';
 
 const INITIAL_PROJECTS = [
     {
@@ -191,8 +192,15 @@ export const ProjectsView = ({ isAuthenticated }: { isAuthenticated: boolean }) 
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {projects.map(project => (
-                    <div key={project.id} className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl hover:border-sky-300 transition-all group relative">
+                {projects.map((project, index) => (
+                    <motion.div 
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                        key={project.id} 
+                        className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl hover:border-sky-300 transition-all group relative"
+                    >
                         <div className="relative h-64 overflow-hidden">
                             <img src={project.image} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                             <div className="absolute top-4 left-4 bg-white/90 backdrop-blur text-slate-900 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full">
@@ -235,7 +243,7 @@ export const ProjectsView = ({ isAuthenticated }: { isAuthenticated: boolean }) 
                                 Xem chi tiết dự án <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform"/>
                             </button>
                         </div>
-                    </div>
+                    </motion.div>
                 ))}
                 {projects.length === 0 && (
                     <div className="col-span-full py-12 text-center text-slate-500">

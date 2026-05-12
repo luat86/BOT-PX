@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Loader2, RefreshCw, MapPin, Home, DollarSign, TrendingUp } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
+import { motion, AnimatePresence } from 'motion/react';
 
 const VIETNAM_PROVINCES = ["Hà Nội", "TP. Hồ Chí Minh", "Đà Nẵng", "Cần Thơ", "Bình Dương", "Đồng Nai", "Long An", "Bà Rịa - Vũng Tàu", "Khác"];
 const BUILDING_TYPES = ["Nhà phố", "Biệt thự", "Nhà cấp 4", "Căn hộ chung cư", "Văn phòng", "Khác"];
@@ -99,45 +100,65 @@ Chỉ trả về JSON, không giải thích thêm.`;
           </div>
         </div>
 
-        {prices && (
-          <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
+        <AnimatePresence mode="wait">
+        {prices ? (
+          <motion.div 
+            key="prices"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+            className="space-y-6"
+          >
             <div className="bg-slate-50 p-6 sm:p-8 rounded-xl border border-slate-200">
               <h3 className="font-bold text-slate-800 mb-6 flex items-center justify-center gap-2 text-lg uppercase tracking-wide">
                 <DollarSign size={20} className="text-emerald-600" /> Đơn giá Xây nhà Trọn gói (Chìa khóa trao tay)
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between items-center text-center hover:border-sky-200 transition-colors">
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}
+                  className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between items-center text-center hover:border-sky-200 transition-colors"
+                >
                   <div className="text-slate-500 text-sm font-bold uppercase mb-2">Mức Trung bình</div>
                   <div className="text-2xl font-bold text-slate-800">{formatPrice(prices.turnkeyAverage)}</div>
-                </div>
-                <div className="bg-sky-50 p-6 rounded-xl border border-sky-300 shadow-md flex flex-col justify-between items-center text-center transform md:-translate-y-2 relative">
+                </motion.div>
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}
+                  className="bg-sky-50 p-6 rounded-xl border border-sky-300 shadow-md flex flex-col justify-between items-center text-center transform md:-translate-y-2 relative"
+                >
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-sky-600 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap shadow-sm">Phổ biến</div>
                   <div className="text-sky-700 text-sm font-bold uppercase mb-2 mt-2">Mức Khá</div>
                   <div className="text-3xl font-black text-sky-700">{formatPrice(prices.turnkeyGood)}</div>
-                </div>
-                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between items-center text-center hover:border-amber-200 transition-colors">
+                </motion.div>
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3 }}
+                  className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between items-center text-center hover:border-amber-200 transition-colors"
+                >
                   <div className="text-slate-500 text-sm font-bold uppercase mb-2">Mức Tốt (Cao cấp)</div>
                   <div className="text-2xl font-bold text-slate-800">{formatPrice(prices.turnkeyExcellent)}</div>
-                </div>
+                </motion.div>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 bg-amber-50 p-4 rounded-xl border border-amber-200 text-amber-800 text-sm">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="flex items-start gap-3 bg-amber-50 p-4 rounded-xl border border-amber-200 text-amber-800 text-sm">
               <div className="mt-0.5">💡</div>
               <div>
                 <strong>Xu hướng:</strong> {prices.trend}<br/>
                 <strong>Ghi chú:</strong> {prices.notes}
               </div>
-            </div>
-          </div>
-        )}
-
-        {!prices && !isLoading && (
-          <div className="text-center py-12 bg-slate-50 rounded-xl border border-slate-200 border-dashed">
+            </motion.div>
+          </motion.div>
+        ) : (!isLoading && (
+          <motion.div 
+            key="empty"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="text-center py-12 bg-slate-50 rounded-xl border border-slate-200 border-dashed"
+          >
             <TrendingUp size={48} className="mx-auto text-slate-300 mb-4" />
             <p className="text-slate-500">Nhấn "Cập nhật giá mới" để xem đơn giá thị trường hiện tại.</p>
-          </div>
-        )}
+          </motion.div>
+        ))}
+        </AnimatePresence>
       </div>
     </div>
   );

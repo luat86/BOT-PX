@@ -17,6 +17,7 @@ import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import * as htmlToImage from 'html-to-image';
 import jsPDF from 'jspdf';
+import { motion, AnimatePresence } from 'motion/react';
 import { WorkflowView } from './components/WorkflowView';
 import { MarketPrices } from './components/MarketPrices';
 import { ProjectsView } from './components/ProjectsView';
@@ -140,7 +141,12 @@ const LoginScreen = ({ onLogin, onGuestLogin }: { onLogin: (key: string) => void
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col items-center justify-center p-4">
-            <div className="bg-white/80 backdrop-blur-xl p-10 rounded-[2rem] shadow-2xl max-w-md w-full border border-white animate-in fade-in zoom-in-95 duration-500 ring-1 ring-slate-900/5">
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="bg-white/80 backdrop-blur-xl p-10 rounded-[2rem] shadow-2xl max-w-md w-full border border-white ring-1 ring-slate-900/5"
+            >
                 <div className="flex justify-center mb-8">
                     <div className="bg-gradient-to-b from-sky-50 to-white p-5 rounded-3xl shadow-sm border border-slate-100 ring-1 ring-slate-900/5 relative group cursor-pointer transition-all hover:scale-105">
                         <div className="absolute inset-0 bg-sky-400 rounded-3xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
@@ -180,7 +186,7 @@ const LoginScreen = ({ onLogin, onGuestLogin }: { onLogin: (key: string) => void
                         <ArrowRight size={16} />
                     </button>
                 </form>
-            </div>
+            </motion.div>
         </div>
     );
 };
@@ -189,9 +195,9 @@ const PriceQuoteTemplate = React.forwardRef(({ data }: {data: any}, ref: any) =>
     const basicArea = Number(data.area) || 0;
     const floors = Number(data.floors) || 1;
     const mongArea = basicArea * 0.5; 
-    const thanArea = basicArea * floors;
+    const floorArea = basicArea * floors;
     const maiArea = basicArea * 0.5;
-    const totalArea = mongArea + thanArea + maiArea;
+    const totalArea = mongArea + floorArea + maiArea;
     
     // Sử dụng đơn giá từ AI trích xuất (nếu có), nếu không dùng mặc định
     const unitPriceTho = data.unitPrice || (data.title?.includes("Thô") ? 3850000 : 7000000);
@@ -199,92 +205,98 @@ const PriceQuoteTemplate = React.forwardRef(({ data }: {data: any}, ref: any) =>
 
     return (
         <div ref={ref} className="print-area bg-slate-100 p-4 md:p-8 overflow-x-auto">
-            {/* Trang 1: Báo giá tổng quát */}
-            <div id="capture-page-1" className="pdf-page bg-white mx-auto p-[15mm] w-[210mm] min-h-[297mm] font-sans text-slate-800 shadow-sm mb-10 overflow-hidden relative border border-slate-200">
-                <div className="flex justify-between items-start mb-10 border-b-2 border-sky-800 pb-6">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-[#0c4a6e] p-3 rounded-lg text-white font-black text-2xl">PX</div>
-                        <div>
-                            <h2 className="text-xl font-black uppercase text-[#0c4a6e]">PHỐ XANH AI</h2>
-                            <p className="text-[9px] font-bold text-slate-400 tracking-[0.2em]">CÔNG NGHỆ XÂY DỰNG SỐ</p>
-                        </div>
+            {/* Trang 1: Báo giá & Tiến độ */}
+            <div id="capture-page-1" className="pdf-page bg-white mx-auto p-[25mm] w-[210mm] min-h-[297mm] h-[297mm] font-serif text-slate-800 shadow-sm mb-10 overflow-hidden relative border border-slate-200 flex flex-col">
+                <div className="flex justify-between items-start mb-8">
+                    <div className="text-center">
+                        <p className="text-[11pt] font-bold uppercase">CÔNG TY CP PHỐ XANH</p>
+                        <div className="w-16 h-[1px] bg-slate-800 mx-auto mt-1 mb-2"></div>
+                        <p className="text-[10pt]">Số: PX-{Date.now().toString().slice(-4)}/BG-TC</p>
                     </div>
-                    <div className="text-right">
-                        <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter">BÁO GIÁ</h1>
-                        <p className="text-[11px] font-bold text-slate-500 mt-1 uppercase tracking-widest">PX-{Date.now().toString().slice(-6)}</p>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-8 mb-8">
-                    <div className="border-l-4 border-sky-600 pl-5 py-2">
-                        <h3 className="text-[11px] font-bold text-sky-700 uppercase mb-3">Thông tin dự án</h3>
-                        <div className="space-y-1.5 text-[13px]">
-                            <p><span className="text-slate-500">Loại:</span> <span className="font-bold">{data.title}</span></p>
-                            <p><span className="text-slate-500">Công trình:</span> <span className="font-bold">{data.buildingType || 'Nhà phố'}</span></p>
-                            <p><span className="text-slate-500">Vị trí:</span> <span className="font-bold">{data.location}</span></p>
-                            <p><span className="text-slate-500">Quy mô:</span> <span className="font-bold">{data.area}m² | {data.floors} Tầng</span></p>
-                        </div>
-                    </div>
-                    <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 text-right">
-                        <h3 className="text-[10px] font-bold text-slate-400 uppercase mb-1">Dự toán tổng cộng</h3>
-                        <p className="text-3xl font-black text-[#0c4a6e]">{totalCost.toLocaleString('vi-VN')} <span className="text-sm font-normal">VNĐ</span></p>
+                    <div className="text-center">
+                        <p className="font-bold text-[12pt] uppercase tracking-tighter">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+                        <p className="font-bold text-[13pt]">Độc lập - Tự do - Hạnh phúc</p>
+                        <div className="w-40 h-[1px] bg-black mx-auto mt-1 mb-2"></div>
+                        <p className="italic text-[11pt] mt-2">
+                            {data.location || 'TP.HCM'}, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}
+                        </p>
                     </div>
                 </div>
 
-                <div className="mb-8">
-                    <h4 className="text-[14px] font-bold uppercase text-slate-900 mb-4 border-b pb-2">1. Chi tiết diện tích thi công</h4>
-                    <table className="w-full text-[12px] border-collapse">
-                        <thead className="bg-slate-800 text-white">
-                            <tr>
-                                <th className="p-3 text-left border border-slate-300">Hạng mục</th>
-                                <th className="p-3 text-center border border-slate-300">Cách tính</th>
-                                <th className="p-3 text-right border border-slate-300">Diện tích (m²)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td className="p-3 border border-slate-300">Phần móng (Hệ số 50%)</td>
-                                <td className="p-3 text-center border border-slate-300">{basicArea} x 0.5</td>
-                                <td className="p-3 text-right border border-slate-300 font-bold">{mongArea.toFixed(1)}</td>
-                            </tr>
-                            <tr>
-                                <td className="p-3 border border-slate-300">Phần thân (100%)</td>
-                                <td className="p-3 text-center border border-slate-300">{basicArea} x {floors}</td>
-                                <td className="p-3 text-right border border-slate-300 font-bold">{thanArea.toFixed(1)}</td>
-                            </tr>
-                            <tr>
-                                <td className="p-3 border border-slate-300">Phần mái (Hệ số 50%)</td>
-                                <td className="p-3 text-center border border-slate-300">{basicArea} x 0.5</td>
-                                <td className="p-3 text-right border border-slate-300 font-bold">{maiArea.toFixed(1)}</td>
-                            </tr>
-                            <tr className="bg-sky-50 font-bold">
-                                <td className="p-3 border border-slate-300 uppercase" colSpan={2}>Tổng diện tích quy đổi</td>
-                                <td className="p-3 text-right border border-slate-300 text-sky-800 font-black">{totalArea.toFixed(1)} m²</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div className="text-center mb-8">
+                    <h1 className="text-[16pt] font-bold uppercase text-slate-900 mb-2">BÁO GIÁ THI CÔNG XÂY DỰNG</h1>
+                    <p className="text-[12pt] font-bold italic">Kính gửi: QUÝ KHÁCH HÀNG / QUÝ CHỦ ĐẦU TƯ</p>
                 </div>
 
-            </div>
-
-            {/* Trang 2: Phạm vi công việc và Chữ ký */}
-            <div id="capture-page-2" className="pdf-page bg-white mx-auto p-[15mm] w-[210mm] min-h-[297mm] font-sans text-slate-800 shadow-sm mb-10 overflow-hidden relative border border-slate-200">
-                <div className="mb-8">
-                    <h4 className="text-[14px] font-bold uppercase text-slate-900 mb-4 border-b pb-2">2. Đơn giá & Thành tiền</h4>
-                    <div className="p-5 bg-slate-50 rounded-xl border border-slate-200">
-                        <div className="flex justify-between items-center py-2">
-                            <span className="text-[13px]">Đơn giá thi công chuẩn (m²)</span>
-                            <span className="font-bold">{unitPriceTho.toLocaleString()} VNĐ/m²</span>
+                <div className="grid grid-cols-2 gap-6 mb-6">
+                    <div className="pl-4 py-1">
+                        <h3 className="text-[12pt] font-bold text-slate-800 uppercase mb-2">Thông tin dự án</h3>
+                        <div className="space-y-1 text-[12pt]">
+                            <p><span className="text-slate-600">Hạng mục:</span> <span className="font-bold">{data.title}</span></p>
+                            <p><span className="text-slate-600">Công trình:</span> <span className="font-bold">{data.buildingType || 'Nhà phố'}</span></p>
+                            <p><span className="text-slate-600">Vị trí:</span> <span className="font-bold">{data.location}</span></p>
+                            <p><span className="text-slate-600">Quy mô:</span> <span className="font-bold">{data.area}m² x {data.floors} Tầng</span></p>
                         </div>
-                        <div className="flex justify-between items-center py-2 border-t border-slate-200">
-                            <span className="text-[13px] font-bold">Tổng giá trị (Đã bao gồm thuế)</span>
-                            <span className="text-xl font-black text-sky-700">{totalCost.toLocaleString()} VNĐ</span>
+                    </div>
+                    <div className="flex flex-col justify-center text-right">
+                        <h3 className="text-[11pt] font-bold text-slate-500 uppercase mb-1">Dự toán tổng cộng</h3>
+                        <p className="text-[18pt] font-black text-slate-800">{totalCost.toLocaleString('vi-VN')} <span className="text-[12pt] font-normal">VNĐ</span></p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-[1fr_220px] gap-6 mb-6">
+                    <div>
+                        <h4 className="text-[12pt] font-bold uppercase text-slate-900 mb-3 border-b border-black pb-1">1. Chi tiết diện tích thi công</h4>
+                        <table className="w-full text-[11pt] border-collapse mb-1">
+                            <thead className="bg-slate-100 text-slate-800">
+                                <tr>
+                                    <th className="p-2 text-left border border-slate-400">Hạng mục</th>
+                                    <th className="p-2 text-center border border-slate-400">Cách tính</th>
+                                    <th className="p-2 text-right border border-slate-400">Diện tích (m²)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td className="p-2 border border-slate-400">Phần móng (50%)</td>
+                                    <td className="p-2 text-center border border-slate-400">{basicArea} x 0.5</td>
+                                    <td className="p-2 text-right border border-slate-400 font-bold">{mongArea.toFixed(1)}</td>
+                                </tr>
+                                <tr>
+                                    <td className="p-2 border border-slate-400">Diện tích sàn ({floors} tầng)</td>
+                                    <td className="p-2 text-center border border-slate-400">{basicArea} x {floors}</td>
+                                    <td className="p-2 text-right border border-slate-400 font-bold">{floorArea.toFixed(1)}</td>
+                                </tr>
+                                <tr>
+                                    <td className="p-2 border border-slate-400">Phần mái (50%)</td>
+                                    <td className="p-2 text-center border border-slate-400">{basicArea} x 0.5</td>
+                                    <td className="p-2 text-right border border-slate-400 font-bold">{maiArea.toFixed(1)}</td>
+                                </tr>
+                                <tr className="bg-slate-50 font-bold">
+                                    <td className="p-2 border border-slate-400 uppercase" colSpan={2}>Tổng diện tích quy đổi</td>
+                                    <td className="p-2 text-right border border-slate-400 text-slate-900 font-black">{totalArea.toFixed(1)} m²</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div className="flex flex-col">
+                        <h4 className="text-[12pt] font-bold uppercase text-slate-900 mb-3 border-b border-black pb-1">2. Đơn giá & Thành tiền</h4>
+                        <div className="p-4 flex-1 border border-slate-400 flex flex-col justify-center text-center">
+                            <div className="py-2 border-b border-slate-300">
+                                <span className="text-[11pt] text-slate-600 block mb-1">Đơn giá (VNĐ/m²)</span>
+                                <span className="font-bold text-[12pt] block">{unitPriceTho.toLocaleString()}</span>
+                            </div>
+                            <div className="pt-4 mt-auto">
+                                <p className="text-[11pt] uppercase text-slate-600 font-bold mb-1">Tổng cộng:</p>
+                                <p className="text-[16pt] font-black text-slate-800 leading-none">{totalCost.toLocaleString()}</p>
+                                <p className="text-[9pt] text-slate-500 mt-2 italic">Đã bao gồm thuế & phí liên quan</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="mb-10">
-                    <h4 className="text-[14px] font-bold uppercase text-slate-900 mb-4 border-b pb-2">3. Phạm vi công việc chính</h4>
+                <div className="mb-4 flex-1">
+                    <h4 className="text-[12pt] font-bold uppercase text-slate-900 mb-4 border-b border-black pb-1">3. Phạm vi công việc chính</h4>
                     <div className="grid grid-cols-1 gap-y-3">
                         {[
                             { label: "Chuẩn bị:", text: "Lập lán trại, vận chuyển thiết bị, tập kết vật tư đầu vào." },
@@ -294,67 +306,63 @@ const PriceQuoteTemplate = React.forwardRef(({ data }: {data: any}, ref: any) =>
                             { label: "Vệ sinh:", text: "Vệ sinh công nghiệp và bàn giao công trình đưa vào sử dụng." },
                             { label: "Pháp lý:", text: "Hỗ trợ xin phép xây dựng và hoàn công dự án." }
                         ].map((item, i) => (
-                            <div key={i} className="flex gap-3 text-[13px] items-start border-b border-slate-50 pb-2">
-                                <div className="mt-1 flex-shrink-0"><CheckSquare size={14} className="text-sky-600"/></div>
+                            <div key={i} className="flex gap-3 text-[12pt] items-start border-b border-slate-50 pb-2">
+                                <div className="mt-1 flex-shrink-0"><CheckSquare size={14} className="text-slate-600"/></div>
                                 <div><span className="font-bold text-slate-700">{item.label}</span> {item.text}</div>
                             </div>
                         ))}
                     </div>
                 </div>
-
-                <div className="p-5 bg-amber-50 rounded-xl border border-amber-100 mb-10">
-                    <div className="flex gap-3">
-                        <AlertCircle size={18} className="text-amber-600 flex-shrink-0"/>
-                        <p className="text-[11px] text-amber-800 italic">Lưu ý: Báo giá có giá trị trong vòng 30 ngày. Đơn giá có thể điều chỉnh dựa trên điều kiện thực tế của mặt bằng thi công và thời điểm ký kết hợp đồng.</p>
-                    </div>
+                
+                <div className="mt-auto pt-4 flex gap-3 p-3 bg-amber-50 rounded-lg border border-amber-100 text-[10pt] text-amber-800 italic">
+                    <AlertCircle size={14} className="text-amber-600 flex-shrink-0"/>
+                    <p>Báo giá có giá trị trong vòng 30 ngày. Đơn giá có thể thay đổi dựa trên điều kiện thực tế mặt bằng và thiết kế chi tiết.</p>
                 </div>
+            </div>
 
-                <div className="mt-20 grid grid-cols-2 text-center absolute bottom-[30mm] left-0 right-0 px-[15mm]">
+            {/* Trang 2: Chi tiết điều khoản và tiến độ */}
+            <div id="capture-page-2" className="pdf-page bg-white mx-auto p-[25mm] w-[210mm] min-h-[297mm] font-serif text-slate-800 shadow-sm mb-10 overflow-hidden relative border border-slate-200 flex flex-col">
+                {data.content && (
+                    <div className="mb-10">
+                        <h4 className="text-[13pt] font-bold uppercase text-slate-900 mb-4 border-b border-black pb-1">4. Chi tiết các hạng mục và điều khoản (Đề xuất)</h4>
+                        <div className="text-justify text-[12pt] leading-[1.6] admin-body markdown-body">
+                            <Markdown remarkPlugins={[remarkGfm, remarkBreaks]}>{cleanContentFromAI(data.content)}</Markdown>
+                        </div>
+                    </div>
+                )}
+
+                {data.timeline && (
+                    <div className="mb-10">
+                        <h4 className="text-[13pt] font-bold uppercase text-slate-900 mb-3 border-b border-black pb-1">5. Tiến độ thi công dự kiến</h4>
+                        <div className="p-4 border border-slate-400 h-[260px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={data.timeline} layout="vertical" margin={{ top: 10, right: 30, left: 20, bottom: 0 }}>
+                                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                                    <XAxis type="number" unit=" th" tick={{fontSize: 10}} />
+                                    <YAxis dataKey="task" type="category" width={110} tick={{fontSize: 10}} />
+                                    <Tooltip cursor={{fill: 'transparent'}} formatter={(value: number, name: string) => [value + ' tháng', name === 'duration' ? 'Thời gian' : 'Bắt đầu']} />
+                                    <Bar dataKey="start" stackId="a" fill="transparent" />
+                                    <Bar dataKey="duration" stackId="a" fill="#0284c7" radius={[0, 4, 4, 0]} barSize={16} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                )}
+
+                <div className="mt-8 grid grid-cols-2 text-center relative pt-10">
                     <div>
-                        <p className="font-bold uppercase text-[11px] mb-24 text-slate-400">Đại diện Chủ đầu tư</p>
-                        <p className="text-slate-300 italic text-[10px]">(Ký và ghi rõ họ tên)</p>
+                        <p className="font-bold uppercase text-[11pt] mb-20">Đại diện Chủ đầu tư</p>
+                        <p className="text-slate-500 italic text-[10pt]">(Ký và ghi rõ họ tên)</p>
                     </div>
                     <div>
-                        <p className="font-bold uppercase text-[11px] mb-24">Đại diện Nhà thầu</p>
+                        <p className="font-bold uppercase text-[11pt] mb-20">Đại diện Nhà thầu</p>
                         <div className="relative inline-block">
-                             <p className="font-bold text-sky-800 text-lg">PHỐ XANH AI</p>
-                             <div className="absolute -top-4 -right-8 opacity-20"><Stamp size={64} className="text-red-600 rotate-12"/></div>
+                             <p className="font-bold text-slate-800 text-[12pt]">CÔNG TY CP PHỐ XANH</p>
+                             <div className="absolute -top-6 -right-6 opacity-30"><Stamp size={64} className="text-red-700 rotate-[-15deg]"/></div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            {/* Trang 3: Chi tiết báo giá từ AI */}
-            {(data.content || data.timeline) && (
-                <div id="capture-page-3" className="pdf-page bg-white mx-auto p-[15mm] w-[210mm] min-h-[297mm] font-sans text-slate-800 shadow-sm mb-10 overflow-hidden relative border border-slate-200">
-                    {data.timeline && (
-                        <div className="mb-10">
-                            <h4 className="text-[14px] font-bold uppercase text-slate-900 mb-4 border-b pb-2">5. Tiến độ thi công dự kiến</h4>
-                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                                <ResponsiveContainer width="100%" height={250}>
-                                    <BarChart data={data.timeline} layout="vertical" margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
-                                        <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                                        <XAxis type="number" unit=" tháng" />
-                                        <YAxis dataKey="task" type="category" width={120} tick={{fontSize: 11}} />
-                                        <Tooltip cursor={{fill: 'transparent'}} formatter={(value: number, name: string) => [value + ' tháng', name === 'duration' ? 'Thời gian' : 'Bắt đầu']} />
-                                        <Bar dataKey="start" stackId="a" fill="transparent" />
-                                        <Bar dataKey="duration" stackId="a" fill="#0284c7" radius={[0, 4, 4, 0]} />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </div>
-                    )}
-                    
-                    {data.content && (
-                        <div className="mb-8">
-                            <h4 className="text-[14px] font-bold uppercase text-slate-900 mb-4 border-b pb-2">{data.timeline ? '6' : '5'}. Chi tiết các hạng mục và điều khoản (AI Đề xuất)</h4>
-                            <div className="text-justify text-[13px] leading-[1.8] admin-body markdown-body">
-                                <Markdown remarkPlugins={[remarkGfm, remarkBreaks]}>{cleanContentFromAI(data.content)}</Markdown>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            )}
         </div>
     );
 });
@@ -723,7 +731,69 @@ ${result.content}`;
         const isDailyLog = targetSubType.toLowerCase().includes('nhật ký công trình');
         const isArisingVolume = targetSubType.toLowerCase().includes('phát sinh') && targetSubType.toLowerCase().includes('khối lượng');
         
+        let unitPrice = null;
+        if (targetSubType.toLowerCase().includes("báo giá")) {
+            if (formData.priceSource === 'manual' && formData.manualUnitPrice && parseInt(formData.manualUnitPrice) > 0) {
+                unitPrice = parseInt(formData.manualUnitPrice);
+            } else if (formData.priceSource === 'internal' && internalData) {
+                try {
+                    const priceResponse = await getAIClient().models.generateContent({
+                        model: "gemini-3-flash-preview",
+                        contents: `Dựa vào tài liệu nội bộ sau đây, hãy tìm và trích xuất ĐƠN GIÁ THI CÔNG CHUẨN (VNĐ/m2) áp dụng cho loại công trình "${formData.buildingType}" và gói "${targetSubType}". 
+Yêu cầu:
+- CHỈ trả về MỘT CON SỐ DUY NHẤT (ví dụ: 6500000). 
+- KHÔNG giải thích thêm. 
+- Nếu trong tài liệu không có đơn giá nào, hãy trả về số 0.
+
+TÀI LIỆU NỘI BỘ:
+${internalData.substring(0, 15000)}`
+                    });
+                    const priceStr = priceResponse.text.replace(/[^0-9]/g, '');
+                    if (priceStr && parseInt(priceStr) > 100000) {
+                        unitPrice = parseInt(priceStr);
+                    }
+                } catch (err) {
+                    console.error("Lỗi trích xuất đơn giá nội bộ:", err);
+                }
+            } else if (formData.priceSource === 'market' || formData.priceSource === 'ai_estimate') {
+                try {
+                    const priceTarget = formData.priceSource === 'market' ? "hình thức Thi công Trọn gói (Chìa khóa trao tay)" : `gói "${targetSubType}"`;
+                    const priceResponse = await getAIClient().models.generateContent({
+                        model: "gemini-3-flash-preview",
+                        contents: `Hãy ước tính ĐƠN GIÁ THI CÔNG CHUẨN (VNĐ/m2) trung bình trên thị trường hiện nay áp dụng cho loại công trình "${formData.buildingType}" tại "${formData.location}" và ${priceTarget}.
+Yêu cầu:
+- CHỈ trả về MỘT CON SỐ DUY NHẤT (ví dụ: 6500000). 
+- KHÔNG giải thích thêm.`
+                    });
+                    const priceStr = priceResponse.text.replace(/[^0-9]/g, '');
+                    if (priceStr && parseInt(priceStr) > 100000) {
+                        unitPrice = parseInt(priceStr);
+                    }
+                } catch (err) {
+                    console.error("Lỗi ước tính đơn giá thị trường:", err);
+                }
+            }
+        }
+
+        const basicArea = Number(formData.area) || 0;
+        const floors = Number(formData.floors) || 1;
+        const mongArea = basicArea * 0.5; 
+        const floorArea = basicArea * floors;
+        const maiArea = basicArea * 0.5;
+        const totalConvertedArea = mongArea + floorArea + maiArea;
+        const finalUnitPrice = unitPrice || (targetSubType.includes("Thô") ? 3850000 : 7000000);
+        const totalCost = totalConvertedArea * finalUnitPrice;
+
         let projectInfo = `- Thông tin dự án: Loại công trình ${formData.buildingType}, địa điểm ${formData.location}, quy mô ${formData.area}m2, ${formData.floors} tầng.`;
+        if (targetSubType.toLowerCase().includes("báo giá") || targetSubType.toLowerCase().includes("hợp đồng")) {
+            projectInfo += `
+- HƯỚNG DẪN BẮT BUỘC VỀ GIÁ TRỊ TỔNG CỘNG:
+  + TỔNG DIỆN TÍCH SÀN QUY ĐỔI THI CÔNG: ${totalConvertedArea.toFixed(1)} m2. (KHÔNG ĐƯỢC TÍNH THEO DIỆN TÍCH ĐÁY/CƠ BẢN DO ĐÃ CÓ HỆ SỐ MÓNG MÁI)
+  + ĐƠN GIÁ: ${finalUnitPrice.toLocaleString('vi-VN')} VNĐ/m2.
+  + TỔNG GIÁ TRỊ LUÔN LÀ: ${totalCost.toLocaleString('vi-VN')} VNĐ.
+  => TRONG PHẦN BÁO GIÁ HAY HỢP ĐỒNG (VÍ DỤ ĐIỀU VỀ GIÁ TRỊ), BẮT BUỘC DÙNG DỮ LIỆU NÀY LÀM TỔNG GIÁ TRỊ.`;
+        }
+
         if (isRecord) {
             projectInfo = `- Thông tin dự án: Loại công trình ${formData.buildingType}, địa điểm ${formData.location}.
 - Đối tượng nghiệm thu/công việc: ${formData.acceptanceObject || 'Theo thực tế thi công'}
@@ -741,7 +811,8 @@ ${projectInfo}
 - BẮT BUỘC trình bày theo CHUẨN VĂN BẢN HÀNH CHÍNH CHUYÊN NGHIỆP, BỐ CỤC TRANG A4 THEO NGHỊ ĐỊNH 30/2020/NĐ-CP.
 - ĐỐI VỚI HỢP ĐỒNG XÂY DỰNG: BẮT BUỘC tuân thủ theo mẫu và quy định của NGHỊ ĐỊNH 37/2015/NĐ-CP (hoặc các nghị định sửa đổi, bổ sung liên quan về hợp đồng xây dựng).
 - ĐỐI VỚI HỒ SƠ QUẢN LÝ CHẤT LƯỢNG (Biên bản nghiệm thu, nhật ký...): BẮT BUỘC tuân thủ theo mẫu và quy định của NGHỊ ĐỊNH 06/2021/NĐ-CP về quản lý chất lượng, thi công xây dựng và bảo trì công trình xây dựng.
-- Phân chia rõ ràng thành các Phần, Điều, Khoản (ví dụ: ĐIỀU 1:..., 1.1..., 1.2...).
+- Phân chia rõ ràng thành các Phần, Điều, Khoản (ví dụ: ĐIỀU 1:..., 1.1..., 1.2...). TUYỆT ĐỐI KHÔNG SOẠN "ĐIỀU 6" HOẶC PHẦN "ĐIỀU 6" (NẾU CÓ HÃY ĐỔI TÊN HOẶC GỘP VÀO ĐIỀU KHÁC).
+- Trình bày bố cục outline (chỉ mục số, chữ) rõ ràng với các cấp độ tuyến tính (1., 1.1., a., b.).
 - Trình bày các đầu mục (1.1, 1.2...) in đậm. MỖI ĐẦU MỤC PHẢI BẮT ĐẦU Ở MỘT DÒNG MỚI. Nội dung chi tiết của đầu mục đó có thể viết liền sau tiêu đề trên cùng một dòng.
 - Sử dụng Markdown để in đậm các tiêu đề Điều, Khoản.
 - LOẠI BỎ HOÀN TOÀN các ký tự đặc biệt thừa thãi (như *, #, -, _ không cần thiết), giữ văn bản sạch sẽ, trang trọng.
@@ -788,6 +859,7 @@ ${projectInfo}
 - KHÔNG CẦN MỤC LỤC.
 - Trình bày các đầu mục in đậm. MỖI ĐẦU MỤC PHẢI BẮT ĐẦU Ở MỘT DÒNG MỚI. Nội dung chi tiết của đầu mục đó có thể viết liền sau tiêu đề trên cùng một dòng.
 - Sử dụng Markdown để in đậm các tiêu đề.
+- TUYỆT ĐỐI KHÔNG SỬ DỤNG ĐIỀU 6 trong bất kỳ nội dung nào.
 - LOẠI BỎ HOÀN TOÀN các ký tự đặc biệt thừa thãi, giữ văn bản sạch sẽ.
 - Tạo sẵn các dòng gạch dưới (_____) để các bên ký và ghi rõ họ tên ở cuối biên bản.`;
         }
@@ -822,50 +894,6 @@ ${formatInstructions}`;
           contents: prompt,
         });
         const content = response.text;
-
-        let unitPrice = null;
-        if (targetSubType.toLowerCase().includes("báo giá")) {
-            if (formData.priceSource === 'manual' && formData.manualUnitPrice && parseInt(formData.manualUnitPrice) > 0) {
-                unitPrice = parseInt(formData.manualUnitPrice);
-            } else if (formData.priceSource === 'internal' && internalData) {
-                try {
-                    const priceResponse = await getAIClient().models.generateContent({
-                        model: "gemini-3-flash-preview",
-                        contents: `Dựa vào tài liệu nội bộ sau đây, hãy tìm và trích xuất ĐƠN GIÁ THI CÔNG CHUẨN (VNĐ/m2) áp dụng cho loại công trình "${formData.buildingType}" và gói "${targetSubType}". 
-Yêu cầu:
-- CHỈ trả về MỘT CON SỐ DUY NHẤT (ví dụ: 6500000). 
-- KHÔNG giải thích thêm. 
-- Nếu trong tài liệu không có đơn giá nào, hãy trả về số 0.
-
-TÀI LIỆU NỘI BỘ:
-${internalData.substring(0, 15000)}`
-                    });
-                    const priceStr = priceResponse.text.replace(/[^0-9]/g, '');
-                    if (priceStr && parseInt(priceStr) > 100000) {
-                        unitPrice = parseInt(priceStr);
-                    }
-                } catch (err) {
-                    console.error("Lỗi trích xuất đơn giá nội bộ:", err);
-                }
-            } else if (formData.priceSource === 'market' || formData.priceSource === 'ai_estimate') {
-                try {
-                    const priceTarget = formData.priceSource === 'market' ? "hình thức Thi công Trọn gói (Chìa khóa trao tay)" : `gói "${targetSubType}"`;
-                    const priceResponse = await getAIClient().models.generateContent({
-                        model: "gemini-3-flash-preview",
-                        contents: `Hãy ước tính ĐƠN GIÁ THI CÔNG CHUẨN (VNĐ/m2) trung bình trên thị trường hiện nay áp dụng cho loại công trình "${formData.buildingType}" tại "${formData.location}" và ${priceTarget}.
-Yêu cầu:
-- CHỈ trả về MỘT CON SỐ DUY NHẤT (ví dụ: 6500000). 
-- KHÔNG giải thích thêm.`
-                    });
-                    const priceStr = priceResponse.text.replace(/[^0-9]/g, '');
-                    if (priceStr && parseInt(priceStr) > 100000) {
-                        unitPrice = parseInt(priceStr);
-                    }
-                } catch (err) {
-                    console.error("Lỗi ước tính đơn giá thị trường:", err);
-                }
-            }
-        }
 
         let timelineData = null;
         if (!isRecord) {
@@ -993,8 +1021,16 @@ Chỉ trả về JSON, không giải thích thêm.`,
       </div>
 
       <main className="container mx-auto py-6 md:py-10 px-4 md:px-6">
+        <AnimatePresence mode="wait">
         {view === 'home' && (
-            <div className="max-w-6xl mx-auto space-y-12 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <motion.div 
+                key="home"
+                initial={{ opacity: 0, y: 20 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4 }}
+                className="max-w-6xl mx-auto space-y-12 pb-12"
+            >
                 {/* Hero Section */}
                 <div className="relative bg-slate-900 rounded-[2rem] overflow-hidden shadow-2xl">
                     <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/90 to-transparent z-10"></div>
@@ -1090,27 +1126,35 @@ Chỉ trả về JSON, không giải thích thêm.`,
                         <PenTool size={18} className="text-sky-600" /> Tạo Hồ Sơ Ngay
                     </button>
                 </div>
-            </div>
+            </motion.div>
         )}
 
         {view === 'workflow' && (
-            <WorkflowView onDocumentClick={(docName) => handleGenerate(docName)} />
+            <motion.div key="workflow" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }}>
+                <WorkflowView onDocumentClick={(docName) => handleGenerate(docName)} />
+            </motion.div>
         )}
 
         {view === 'market' && (
-            <MarketPrices />
+            <motion.div key="market" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }}>
+                <MarketPrices />
+            </motion.div>
         )}
 
         {view === 'projects' && (
-            <ProjectsView isAuthenticated={localStorage.getItem('phoxanh_api_key') === '090.6381-186'} />
+            <motion.div key="projects" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }}>
+                <ProjectsView isAuthenticated={localStorage.getItem('phoxanh_api_key') === '090.6381-186'} />
+            </motion.div>
         )}
 
         {view === 'library' && (
-            <ArchitectureLibrary isAuthenticated={localStorage.getItem('phoxanh_api_key') === '090.6381-186'} />
+            <motion.div key="library" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }}>
+                <ArchitectureLibrary isAuthenticated={localStorage.getItem('phoxanh_api_key') === '090.6381-186'} />
+            </motion.div>
         )}
 
         {view === 'generator' && (
-          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in slide-in-from-bottom-10 duration-500">
+          <motion.div key="generator" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }} className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-5 space-y-4">
                 <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
                     <h3 className="text-sm font-black text-slate-800 uppercase mb-6 flex items-center gap-2">
@@ -1273,11 +1317,11 @@ Chỉ trả về JSON, không giải thích thêm.`,
                     </div>
                 </div>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {view === 'internal' && (
-            <div className="max-w-4xl mx-auto animate-in fade-in duration-500">
+            <motion.div key="internal" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }} className="max-w-4xl mx-auto">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight uppercase">Tài liệu nội bộ</h2>
                     <div className="flex flex-wrap gap-3">
@@ -1303,11 +1347,11 @@ Chỉ trả về JSON, không giải thích thêm.`,
                         className="w-full p-6 rounded-2xl border border-slate-200 bg-slate-50 text-sm h-[500px] focus:ring-2 focus:ring-sky-500 outline-none transition-all leading-relaxed" 
                     />
                 </div>
-            </div>
+            </motion.div>
         )}
 
         {view === 'processing' && (
-            <div className="flex flex-col items-center justify-center py-32 space-y-6">
+            <motion.div key="processing" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.4 }} className="flex flex-col items-center justify-center py-32 space-y-6">
                 <div className="relative">
                     <div className="w-24 h-24 border-4 border-sky-100 border-t-sky-600 rounded-full animate-spin"></div>
                     <div className="absolute inset-0 flex items-center justify-center"><HardHat size={28} className="text-sky-600"/></div>
@@ -1320,11 +1364,11 @@ Chỉ trả về JSON, không giải thích thêm.`,
                         <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] animate-pulse delay-150">3. Tối ưu hóa layout in ấn A4</p>
                     </div>
                 </div>
-            </div>
+            </motion.div>
         )}
 
         {view === 'result' && result && (
-            <div className="max-w-5xl mx-auto pb-32 animate-in fade-in zoom-in-95 duration-500">
+            <motion.div key="result" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }} className="max-w-5xl mx-auto pb-32">
                 <div className="flex flex-wrap justify-between items-center mb-8 no-print gap-4">
                     <button onClick={() => setView('home')} className="px-6 py-3 bg-white text-slate-500 font-bold text-xs uppercase flex items-center gap-2 hover:text-sky-600 rounded-xl border border-slate-200 transition-all shadow-sm">
                         <ArrowLeft size={16}/> Quay lại
@@ -1354,8 +1398,9 @@ Chỉ trả về JSON, không giải thích thêm.`,
                         <DocumentTemplate data={result} ref={null} />
                     }
                 </div>
-            </div>
+            </motion.div>
         )}
+        </AnimatePresence>
       </main>
 
       <footer className="py-12 border-t border-slate-200 bg-white no-print">
@@ -1406,7 +1451,7 @@ Chỉ trả về JSON, không giải thích thêm.`,
         }
 
         .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .admin-body { font-family: 'Noto Serif', serif; }
+        .admin-body { font-family: 'Calibri', 'Carlito', sans-serif; }
       `}} />
     </div>
   );

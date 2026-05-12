@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-sans: "Futura", "Trebuchet MS", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Calibri", "Carlito", ui-serif, Georgia, Cambria, Times, serif;
+  --font-display: "Futura", "Trebuchet MS", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, monospace;
   --color-gray-50: #f9fafb;
   --color-gray-100: #f3f4f6;
   --color-gray-200: #e5e7eb;
@@ -132,6 +133,63 @@
 
   .markdown-body tr:nth-child(even) td {
     @apply bg-slate-50/50;
+  }
+
+  /* Chuyên nghiệp hành chính */
+  .admin-body {
+    @apply font-serif text-[14pt] text-black tracking-normal;
+  }
+
+  .admin-body h1 {
+    @apply text-[14pt] font-bold uppercase mt-4 mb-2 text-black border-none pb-0 inline-block text-center w-full;
+  }
+
+  .admin-body h2 {
+    @apply text-[14pt] font-bold mt-4 mb-2 text-black uppercase tracking-normal border-none pl-0 bg-transparent py-0;
+  }
+
+  .admin-body h3 {
+    @apply text-[14pt] font-bold italic mt-3 mb-1 text-black no-underline decoration-transparent;
+  }
+
+  .admin-body h4 {
+    @apply text-[14pt] italic mt-2 mb-1 text-black;
+  }
+
+  .admin-body p {
+    @apply mb-3 leading-[1.5] text-justify indent-[1cm];
+  }
+
+  .admin-body ul, .admin-body ol {
+    @apply pl-[1.5cm] mb-3 space-y-1;
+  }
+
+  .admin-body ul {
+    @apply list-disc marker:text-black;
+  }
+
+  .admin-body ol {
+    @apply list-decimal marker:font-normal marker:text-black;
+  }
+
+  .admin-body strong {
+    @apply font-bold text-black bg-transparent px-0 py-0 rounded-none;
+  }
+
+  .admin-body table {
+    @apply border-collapse mb-4 text-[13pt] rounded-none shadow-none;
+  }
+
+  .admin-body th {
+    @apply bg-white font-bold normal-case tracking-normal text-[13pt] text-black text-center;
+  }
+
+  .admin-body th, .admin-body td {
+    @apply border border-black p-2;
+  }
+
+  .admin-body tr:nth-child(even) td {
+    @apply bg-white;
   }
 }
 
